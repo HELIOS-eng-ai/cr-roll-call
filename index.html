@@ -10,20 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-        }
-        /* Custom scrollbar for table */
-        .table-container::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        .table-container::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 4px;
-        }
-        /* Toast animation */
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+        .table-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
         @keyframes slideIn {
             from { transform: translateY(-100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -36,182 +25,312 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
-    <div id="student-view" class="hidden w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200">
-        <div class="bg-blue-600 text-white px-6 py-5 text-center">
-            <h1 class="text-2xl font-bold">Class Registration</h1>
-            <p class="text-blue-100 text-sm mt-1">Enter your details to join the roster</p>
+    <!-- 1. AUTHENTICATION VIEW -->
+    <div id="auth-view" class="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200 transition-all">
+        <div class="bg-blue-600 text-white px-6 py-5 text-center relative">
+            <h1 class="text-2xl font-bold" id="auth-title">Welcome Back</h1>
+            <p class="text-blue-100 text-sm mt-1" id="auth-subtitle">Login to access your dashboard</p>
         </div>
         <div class="p-6">
-            <form id="student-reg-form" class="space-y-4">
+            <form id="login-form" class="space-y-4">
                 <div>
-                    <label for="regRollNo" class="block text-sm font-medium text-gray-700 mb-1">Roll No</label>
-                    <input type="text" id="regRollNo" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                    <label for="loginRegNo" class="block text-sm font-medium text-gray-700 mb-1">Registration No</label>
+                    <input type="text" id="loginRegNo" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
+                </div>
+                <div>
+                    <label for="loginPass" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="loginPass" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
+                </div>
+                <button type="submit" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold shadow-md transition-all">Login</button>
+                <div class="text-center mt-4 text-sm text-gray-600">
+                    New student? <a href="#" onclick="toggleAuthMode('register')" class="text-blue-600 font-semibold hover:underline">Register here</a>
+                </div>
+            </form>
+
+            <form id="register-form" class="space-y-4 hidden">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="regRollNo" class="block text-sm font-medium text-gray-700 mb-1">Roll No</label>
+                        <input type="text" id="regRollNo" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label for="regRegNo" class="block text-sm font-medium text-gray-700 mb-1">Registration No</label>
+                        <input type="text" id="regRegNo" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
                 </div>
                 <div>
                     <label for="regName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input type="text" id="regName" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                    <input type="text" id="regName" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
                 <div>
-                    <label for="regRegNo" class="block text-sm font-medium text-gray-700 mb-1">Registration No</label>
-                    <input type="text" id="regRegNo" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                    <label for="regPass" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="text" id="regPass" required value="BiomedClass" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none">
+                    <p id="regPassText" class="text-xs text-gray-500 mt-1">Default student password is 'BiomedClass'</p>
                 </div>
-                <button type="submit" id="btn-student-submit" disabled class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                    Submit Registration
-                </button>
+                <button type="submit" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold shadow-md transition-all">Register & Join</button>
+                <div class="text-center mt-4 text-sm text-gray-600">
+                    Already registered? <a href="#" onclick="toggleAuthMode('login')" class="text-blue-600 font-semibold hover:underline">Login here</a>
+                </div>
             </form>
-            <div id="reg-success" class="hidden text-center py-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-                    <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+    </div>
+
+    <!-- 2. STUDENT DASHBOARD -->
+    <div id="student-dashboard-view" class="hidden w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden flex-col mt-10">
+        <div class="bg-indigo-600 text-white px-6 py-5 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">Students Dashboard</h1>
+                <p class="text-indigo-100 text-sm mt-1" id="student-welcome-text">Welcome back</p>
+            </div>
+            <button onclick="logout()" class="text-indigo-100 hover:text-white font-medium text-sm">Logout</button>
+        </div>
+        <div class="p-6 bg-gray-50 flex-grow min-h-[40vh]">
+            <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex items-center gap-2 mb-4 text-indigo-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    <h2 class="text-lg font-bold">Class Announcements</h2>
                 </div>
-                <h2 class="text-xl font-bold text-gray-800 mb-2">Registration Successful!</h2>
-                <p class="text-gray-600">Your details have been added to the class roster. You can safely close this page.</p>
+                
+                <h4 class="text-sm font-bold text-gray-700 mb-3 border-b pb-1">Recent (Last 7 Days)</h4>
+                <div id="student-recent-announcements" class="space-y-4"></div>
+                
+                <button onclick="togglePastAnnouncements('student')" id="btn-student-past-announcements" class="mt-4 text-indigo-600 text-sm font-semibold hidden hover:underline">View Past Announcements</button>
+                <div id="student-past-announcements" class="space-y-4 mt-4 hidden border-t border-gray-200 pt-4"></div>
             </div>
         </div>
     </div>
 
-    <div id="cr-view" class="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
+    <!-- 3. CR DASHBOARD -->
+    <div id="cr-view" class="hidden w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden flex-col">
         <div class="bg-blue-600 text-white px-6 py-5 flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold">Class Attendance Manager</h1>
                 <p class="text-blue-100 text-sm mt-1">Class Representative Dashboard</p>
             </div>
-            <div id="auth-status" class="text-sm font-medium bg-blue-700 px-3 py-1 rounded-full flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" id="auth-indicator"></span>
-                <span id="auth-text">Connecting...</span>
+            <div class="flex items-center gap-4">
+                <button onclick="openAnnouncementListModal()" class="p-2 hover:bg-blue-700 rounded-full transition-colors" title="Announcements">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                </button>
+                <button onclick="openSettings()" class="p-2 hover:bg-blue-700 rounded-full transition-colors" title="Settings">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+                <button onclick="logout()" class="text-blue-100 hover:text-white font-medium text-sm">Logout</button>
             </div>
         </div>
 
-        <div class="p-6 flex-grow flex flex-col gap-6">
+        <div class="p-6 flex-grow flex flex-col gap-6" id="cr-main-content">
             
-            <!-- Class Details Inputs -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div>
-                    <label for="courseName" class="block text-sm font-semibold text-gray-700 mb-1">Course</label>
-                    <input type="text" id="courseName" placeholder="e.g., B.Tech / B.Sc" 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
-                </div>
-                <div>
-                    <label for="className" class="block text-sm font-semibold text-gray-700 mb-1">Class Name / Subject</label>
-                    <input type="text" id="className" placeholder="e.g., Computer Science 101" 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
-                </div>
-                <div>
-                    <label for="classDate" class="block text-sm font-semibold text-gray-700 mb-1">Date</label>
-                    <input type="date" id="classDate" 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+            <!-- CR Home Cards -->
+            <div id="cr-home-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Take Attendance Card -->
+                <div id="attendance-card" onclick="requestAttendanceAccess()" class="bg-white border-2 border-gray-200 rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[220px] relative hover:border-blue-500 cursor-pointer hover:shadow-md group">
+                    <div class="absolute top-4 right-4" id="attendance-card-status">
+                        <span class="bg-gray-100 text-gray-500 px-2 py-1 rounded-full text-xs font-bold animate-pulse">Checking status...</span>
+                    </div>
+                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800">Take Attendance</h3>
+                    <p class="text-sm text-gray-500 mt-2 text-center">Manage daily roll call and export PDF reports</p>
                 </div>
             </div>
 
-            <!-- Controls -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-blue-50 p-4 rounded-lg border border-blue-100">
-                <div>
-                    <h2 class="text-lg font-semibold text-blue-900">Student Roster</h2>
-                    <p class="text-xs text-blue-600 mt-1">Manage your class list here.</p>
-                </div>
-                <div class="flex gap-2 w-full sm:w-auto">
-                    <button onclick="copyRegistrationLink()" id="btn-copy-link"
-                            class="flex-1 sm:flex-none bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-md font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                        <span>Copy Link</span>
+            <!-- Attendance Workspace (Hidden by Default) -->
+            <div id="attendance-workspace" class="hidden flex-col gap-6 flex-grow">
+                <!-- Toolbar -->
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <button onclick="releaseAttendanceAccess()" class="text-gray-700 hover:text-blue-600 flex items-center gap-2 font-semibold text-sm bg-white px-4 py-2 rounded-md shadow-sm border border-gray-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Save & Return to Dashboard
                     </button>
-                    <button onclick="openModal()" 
-                            class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors shadow-sm"
-                            id="btn-open-modal">
-                        + Add Student
+                    <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1.5 rounded-md font-bold uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                        Live Session Active
+                    </span>
+                </div>
+
+                <!-- Class Details Inputs -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div>
+                        <label for="courseName" class="block text-sm font-semibold text-gray-700 mb-1">Course</label>
+                        <input type="text" id="courseName" placeholder="e.g., B.Tech / B.Sc" class="w-full px-4 py-2 border border-gray-300 rounded-md outline-none">
+                    </div>
+                    <div>
+                        <label for="className" class="block text-sm font-semibold text-gray-700 mb-1">Class Name</label>
+                        <input type="text" id="className" placeholder="e.g., Computer Science 101" class="w-full px-4 py-2 border border-gray-300 rounded-md outline-none">
+                    </div>
+                    <div>
+                        <label for="eventTopic" class="block text-sm font-semibold text-gray-700 mb-1">Event</label>
+                        <input type="text" id="eventTopic" placeholder="e.g., Guest Lecture" class="w-full px-4 py-2 border border-gray-300 rounded-md outline-none">
+                    </div>
+                    <div>
+                        <label for="classDate" class="block text-sm font-semibold text-gray-700 mb-1">Date</label>
+                        <input type="date" id="classDate" class="w-full px-4 py-2 border border-gray-300 rounded-md outline-none">
+                    </div>
+                </div>
+
+                <!-- Table Container -->
+                <div class="flex-grow border border-gray-200 rounded-lg overflow-hidden flex flex-col">
+                    <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <h2 class="font-semibold text-gray-700">Student Roll Call Roster</h2>
+                            <span id="student-count" class="text-sm text-gray-500 bg-white px-2 py-1 rounded border border-gray-200">0 Students</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="markAll(true)" class="text-sm bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1.5 rounded-md font-medium transition-colors border border-green-300">
+                                Mark All Present
+                            </button>
+                            <button onclick="markAll(false)" class="text-sm bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-md font-medium transition-colors border border-red-300">
+                                Mark All Absent
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-y-auto table-container flex-grow max-h-[40vh]">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b w-20">Roll No</th>
+                                    <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b">Name</th>
+                                    <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b">Reg No</th>
+                                    <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b text-center">Present</th>
+                                    <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-list" class="divide-y divide-gray-100">
+                                <tr><td colspan="5" class="py-8 text-center text-gray-400">Loading roster...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-4 border-t border-gray-200">
+                    <button onclick="exportToPDF()" id="btn-export" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium shadow-md transition-all flex items-center gap-2">
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" /></svg>
+                        Export PDF
                     </button>
                 </div>
             </div>
-
-            <!-- Table Container -->
-            <div class="flex-grow border border-gray-200 rounded-lg overflow-hidden flex flex-col">
-                <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-                    <h2 class="font-semibold text-gray-700">Student Roll Call</h2>
-                    <span id="student-count" class="text-sm text-gray-500 bg-white px-2 py-1 rounded border border-gray-200">0 Students</span>
-                </div>
-                <div class="overflow-y-auto table-container flex-grow max-h-[40vh]">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b w-20">Roll No</th>
-                                <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b">Name</th>
-                                <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b">Reg No</th>
-                                <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b text-center">Status</th>
-                                <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="student-list" class="divide-y divide-gray-100">
-                            <tr>
-                                <td colspan="5" class="py-8 text-center text-gray-400">
-                                    Loading roster...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="flex justify-end pt-4 border-t border-gray-200">
-                <button onclick="exportToPDF()" id="btn-export"
-                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium shadow-md transition-all flex items-center gap-2 transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
-                    </svg>
-                    Export PDF
-                </button>
-            </div>
-            
         </div>
     </div>
 
-    <!-- Text Summary Section (Hidden by default, shown after export) -->
+    <!-- Text Summary Section -->
     <div id="text-summary-section" class="w-full max-w-4xl bg-white rounded-xl shadow-md overflow-hidden flex flex-col mt-6 hidden border border-gray-200">
         <div class="bg-gray-100 px-6 py-3 border-b border-gray-200 flex justify-between items-center">
-            <h2 class="font-bold text-gray-700 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                Plain Text Summary
-            </h2>
-            <button onclick="copyTextSummary()" id="btn-copy-text"
-                    class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-1.5 rounded-md font-medium text-sm transition-colors shadow-sm flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
-                Copy Text
-            </button>
+            <h2 class="font-bold text-gray-700 flex items-center gap-2">Plain Text Summary</h2>
+            <button onclick="copyTextSummary()" id="btn-copy-text" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-1.5 rounded-md font-medium text-sm transition-colors shadow-sm">Copy Text</button>
         </div>
         <div class="p-4">
             <textarea id="text-summary-output" class="w-full h-64 p-4 bg-gray-50 border border-gray-300 rounded-md font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" readonly></textarea>
         </div>
     </div>
 
-    <!-- Add Student Modal -->
-    <div id="add-student-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 px-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
-            <div class="bg-blue-600 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-white">Add New Student</h3>
-                <button onclick="closeModal()" class="text-blue-200 hover:text-white transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+    <!-- Announcement List Modal -->
+    <div id="announcement-list-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all flex flex-col max-h-[85vh]">
+            <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center shrink-0">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    Class Announcements
+                </h3>
+                <button onclick="closeAnnouncementListModal()" class="text-indigo-200 hover:text-white transition-colors">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <form id="modal-form" class="p-6">
-                <div class="space-y-4">
-                    <div>
-                        <label for="modalRollNo" class="block text-sm font-medium text-gray-700 mb-1">Roll No</label>
-                        <input type="text" id="modalRollNo" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                    </div>
-                    <div>
-                        <label for="modalName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                        <input type="text" id="modalName" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                    </div>
-                    <div>
-                        <label for="modalRegNo" class="block text-sm font-medium text-gray-700 mb-1">Reg No</label>
-                        <input type="text" id="modalRegNo" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                    </div>
+            
+            <div class="p-6 overflow-y-auto flex-grow">
+                <h4 class="text-sm font-bold text-gray-700 mb-3 border-b pb-1">Recent (Last 7 Days)</h4>
+                <div id="cr-recent-announcements" class="space-y-4"></div>
+                
+                <button onclick="togglePastAnnouncements('cr')" id="btn-cr-past-announcements" class="mt-4 text-indigo-600 text-sm font-semibold hidden hover:underline">View Past Announcements</button>
+                <div id="cr-past-announcements" class="space-y-4 mt-4 hidden border-t border-gray-200 pt-4"></div>
+            </div>
+
+            <div class="p-4 border-t border-gray-200 bg-gray-50 shrink-0">
+                <button onclick="openAnnouncementDraftModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-md font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Draft New Announcement
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcement Draft Modal -->
+    <div id="announcement-draft-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[60] px-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all">
+            <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">Draft Announcement</h3>
+                <button onclick="closeAnnouncementDraftModal()" class="text-indigo-200 hover:text-white transition-colors">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-3">This announcement will be instantly visible on all student dashboards.</p>
+                <textarea id="announcement-input" class="w-full h-32 p-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-indigo-500 resize-none" placeholder="Type your class announcement here..."></textarea>
+                
+                <div class="mt-4 flex justify-end items-center gap-4">
+                    <button onclick="closeAnnouncementDraftModal()" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition-colors">Cancel</button>
+                    <button id="btn-publish-announcement" onclick="publishAnnouncement()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-md font-medium transition-colors">Publish</button>
                 </div>
-                <div class="mt-6 flex justify-end gap-3">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors font-medium">Cancel</button>
-                    <button type="submit" id="btn-save" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors font-medium">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CR Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all h-[90vh] flex flex-col">
+            <div class="bg-gray-800 px-6 py-4 flex justify-between items-center shrink-0">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Dashboard Settings
+                </h3>
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-6 overflow-y-auto">
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Share With Class</h4>
+                    <button onclick="copyStudentLink()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 px-4 py-2 rounded-md font-medium transition-colors flex justify-center items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        Copy 'Students Dashboard' Link
+                    </button>
                 </div>
-            </form>
+                
+                <div class="pt-4 border-t border-gray-200">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Add Secondary CR</h4>
+                    <div class="flex gap-2">
+                        <select id="cr-promote-select" class="flex-grow px-3 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500"></select>
+                        <button id="btn-promote-cr" onclick="promoteToCR()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors shrink-0">Promote</button>
+                    </div>
+                    <p id="cr-limit-msg" class="text-xs text-gray-500 mt-1">Their password will change to 'BiomedCR'</p>
+                </div>
+
+                <div class="pt-4 border-t border-gray-200">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Transfer CR Role (One-Time Use)</h4>
+                    <div class="flex gap-2">
+                        <select id="cr-transfer-select" class="flex-grow px-3 py-2 border border-gray-300 rounded-md outline-none focus:border-purple-500"></select>
+                        <button id="btn-transfer-cr" onclick="transferCRRole()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-medium transition-colors shrink-0">Transfer</button>
+                    </div>
+                    <p id="cr-transfer-limit-msg" class="text-xs text-gray-500 mt-1">You will become a student and log out.</p>
+                </div>
+                
+                <div class="pt-4 border-t border-gray-200">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Clear Roster</h4>
+                    <button onclick="deleteAllStudents()" class="w-full bg-orange-100 hover:bg-orange-200 text-orange-700 border border-orange-300 px-4 py-2 rounded-md font-medium transition-colors">
+                        Delete All Student Entries
+                    </button>
+                    <p class="text-xs text-orange-500 mt-1 text-center">Deletes students only. Keeps CRs intact.</p>
+                </div>
+
+                <div class="pt-4 border-t border-gray-200">
+                    <h4 class="text-sm font-semibold text-red-600 mb-2">Danger Zone</h4>
+                    <button onclick="deleteCRDashboard()" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
+                        Delete CR Dashboard (Reset System)
+                    </button>
+                    <p class="text-xs text-red-500 mt-1 text-center font-semibold">WARNING: This permanently wipes the entire database.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -220,37 +339,36 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, onSnapshot, getDoc, setDoc, updateDoc, deleteDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = 'default-attendance-app';
-        const initialAuthToken = null;
-
-        // Environment variables
         const firebaseConfig = {
-  apiKey: "AIzaSyD-gJXLGlrNbgG7MHFOCU93FVFBI8d16aU",
-  authDomain: "attendance-register-c8448.firebaseapp.com",
-  projectId: "attendance-register-c8448",
-  storageBucket: "attendance-register-c8448.firebasestorage.app",
-  messagingSenderId: "180898823565",
-  appId: "1:180898823565:web:077a2e4b6d9a03bbc911c4",
-  measurementId: "G-FLVLVZ9JMJ"
-};
+            apiKey: "AIzaSyD-gJXLGlrNbgG7MHFOCU93FVFBI8d16aU",
+            authDomain: "attendance-register-c8448.firebaseapp.com",
+            projectId: "attendance-register-c8448",
+            storageBucket: "attendance-register-c8448.firebasestorage.app",
+            messagingSenderId: "180898823565",
+            appId: "1:180898823565:web:077a2e4b6d9a03bbc911c4",
+            measurementId: "G-FLVLVZ9JMJ"
+        };
 
-const app = initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        signInAnonymously(auth); 
 
+        window.systemMeta = { transferUsed: false };
+        window.allAnnouncements = [];
+        window.isFirstUser = false;
+        
+        // Locking specific
+        window.sessionLocked = false;
+        window.lockedBy = null;
 
-        // Routing setup
-        const urlParams = new URLSearchParams(window.location.search);
-        const mode = urlParams.get('mode');
-        const crid = urlParams.get('crid');
-
-        let db, auth;
-        let currentUser = null;
         let studentsData = [];
         let attendanceRecord = {}; 
+        let currentUserData = null;
 
-        // Setup defaults
         document.getElementById('classDate').valueAsDate = new Date();
 
         window.showToast = function(message, type = 'success') {
@@ -258,14 +376,8 @@ const app = initializeApp(firebaseConfig);
             const toast = document.createElement('div');
             const bgColor = type === 'error' ? 'bg-red-500' : (type === 'warning' ? 'bg-yellow-500' : 'bg-green-500');
             toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg font-medium toast-enter pointer-events-auto flex items-center gap-2`;
-            
-            // Icon
-            const icon = type === 'error' ? `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
-                       : `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-            
-            toast.innerHTML = `${icon} <span>${escapeHtml(message)}</span>`;
+            toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
             container.appendChild(toast);
-            
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateY(-100%)';
@@ -274,281 +386,451 @@ const app = initializeApp(firebaseConfig);
             }, 3000);
         }
 
-        // Initialize Firebase
-        if (firebaseConfig) {
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            
-            if (mode === 'register' && crid) {
-                document.getElementById('cr-view').classList.add('hidden');
-                document.getElementById('text-summary-section').classList.add('hidden');
-                document.getElementById('student-view').classList.remove('hidden');
-                document.getElementById('student-view').classList.add('flex', 'flex-col');
+        async function initSystem() {
+            // Setup meta docs safely
+            const metaRef = doc(db, 'class_roster', '_system_meta_');
+            const metaSnap = await getDoc(metaRef);
+            if (!metaSnap.exists()) {
+                await setDoc(metaRef, { transferUsed: false });
+            } else {
+                window.systemMeta = metaSnap.data();
             }
-            
-            authenticateUser();
-        } else {
-            updateAuthStatus('Offline Mode', 'bg-red-400');
-            renderTable(); 
+
+            const sessionRef = doc(db, 'class_roster', '_system_session_');
+            const sessionSnap = await getDoc(sessionRef);
+            if (!sessionSnap.exists()) {
+                await setDoc(sessionRef, { activeCR: null, crName: null, timestamp: 0 });
+            }
+
+            // Check users
+            const snapshot = await getDocs(collection(db, 'class_roster'));
+            let userCount = 0;
+            snapshot.forEach(d => {
+                if (d.id !== '_system_meta_' && d.id !== '_system_announcement_' && d.id !== '_system_session_') {
+                    userCount++;
+                }
+            });
+
+            if (userCount === 0) {
+                window.isFirstUser = true;
+                toggleAuthMode('register');
+            } else {
+                window.isFirstUser = false;
+            }
+        }
+        initSystem();
+
+        window.toggleAuthMode = function(mode) {
+            const loginForm = document.getElementById('login-form');
+            const regForm = document.getElementById('register-form');
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+            const passInput = document.getElementById('regPass');
+            const passText = document.getElementById('regPassText');
+
+            if (mode === 'register') {
+                loginForm.classList.add('hidden');
+                regForm.classList.remove('hidden');
+                
+                if (window.isFirstUser) {
+                    title.innerText = 'Database Setup';
+                    subtitle.innerText = 'Register the Master CR to initialize';
+                    if(passInput) passInput.value = 'BiomedCR';
+                    if(passText) passText.innerText = "First user becomes CR. Default password is 'BiomedCR'";
+                } else {
+                    title.innerText = 'Join the Class';
+                    subtitle.innerText = 'Register to access the roster';
+                    if(passInput) passInput.value = 'BiomedClass';
+                    if(passText) passText.innerText = "Default student password is 'BiomedClass'";
+                }
+            } else {
+                regForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                title.innerText = 'Welcome Back';
+                subtitle.innerText = 'Login to access your dashboard';
+            }
         }
 
-        async function authenticateUser() {
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
+        window.logout = async function() {
+            if (currentUserData && currentUserData.role === 'cr') {
+                const workspace = document.getElementById('attendance-workspace');
+                if (workspace && !workspace.classList.contains('hidden')) {
+                    await setDoc(doc(db, 'class_roster', '_system_session_'), { activeCR: null, crName: null, timestamp: Date.now() }, { merge: true });
                 }
-                
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        currentUser = user;
-                        updateAuthStatus('Cloud Synced', 'bg-green-400');
-                        
-                        if (mode === 'register') {
-                            document.getElementById('btn-student-submit').disabled = false;
-                        } else {
-                            loadStudents();
+            }
+            
+            currentUserData = null;
+            document.getElementById('cr-view').style.display = 'none';
+            document.getElementById('student-dashboard-view').style.display = 'none';
+            document.getElementById('text-summary-section').classList.add('hidden');
+            
+            document.getElementById('attendance-workspace').classList.add('hidden');
+            document.getElementById('attendance-workspace').classList.remove('flex');
+            document.getElementById('cr-home-cards').classList.remove('hidden');
+            
+            const authView = document.getElementById('auth-view');
+            authView.style.display = 'block';
+            
+            document.getElementById('login-form').reset();
+            document.getElementById('register-form').reset();
+            showToast("Logged out successfully");
+            initSystem(); 
+        }
+
+        // ---------- CONCURRENCY CONTROL (LOCKING) ---------- //
+        function listenToSession() {
+            onSnapshot(doc(db, 'class_roster', '_system_session_'), (docSnap) => {
+                if (docSnap.exists() && currentUserData && currentUserData.role === 'cr') {
+                    const data = docSnap.data();
+                    const now = Date.now();
+                    const timeout = 30 * 60 * 1000; // 30 min deadlock timeout
+                    
+                    const cardStatus = document.getElementById('attendance-card-status');
+                    const cardEl = document.getElementById('attendance-card');
+                    
+                    if (data.activeCR && data.activeCR !== currentUserData.regNo && (now - data.timestamp) < timeout) {
+                        window.sessionLocked = true;
+                        window.lockedBy = data.crName;
+                        if(cardStatus) cardStatus.innerHTML = `<span class="bg-red-100 text-red-800 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm border border-red-200"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>In use by ${data.crName}</span>`;
+                        if(cardEl) {
+                            cardEl.classList.add('border-red-300', 'bg-red-50');
+                            cardEl.classList.remove('hover:border-blue-500', 'hover:shadow-md');
                         }
                     } else {
-                        updateAuthStatus('Disconnected', 'bg-red-400');
+                        window.sessionLocked = false;
+                        window.lockedBy = null;
+                        if(cardStatus) cardStatus.innerHTML = `<span class="bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm border border-green-200">Available</span>`;
+                        if(cardEl) {
+                            cardEl.classList.remove('border-red-300', 'bg-red-50');
+                            cardEl.classList.add('hover:border-blue-500', 'hover:shadow-md');
+                        }
                     }
-                });
-            } catch (error) {
-                console.error("Auth Error:", error);
-                updateAuthStatus('Auth Failed', 'bg-red-400');
-                showToast("Authentication Failed", "error");
-            }
-        }
-
-        function updateAuthStatus(text, colorClass) {
-            document.getElementById('auth-text').innerText = text;
-            const indicator = document.getElementById('auth-indicator');
-            indicator.className = `w-2 h-2 rounded-full ${colorClass}`;
-            if(colorClass === 'bg-green-400') indicator.classList.add('animate-pulse');
-        }
-
-        function loadStudents() {
-            if (!currentUser || !db) return;
-
-            const studentsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'students');
-            
-            onSnapshot(studentsRef, (snapshot) => {
-                studentsData = [];
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    studentsData.push({ 
-                        id: doc.id, 
-                        rollNo: data.rollNo || '',
-                        name: data.name, 
-                        regNo: data.regNo || '',
-                        createdAt: data.createdAt 
-                    });
-                    
-                    if (!attendanceRecord[doc.id]) {
-                        attendanceRecord[doc.id] = 'Present';
-                    }
-                });
-                
-                // Sort locally by Roll No naturally (e.g. '2' comes before '10')
-                studentsData.sort((a, b) => {
-                    return String(a.rollNo).localeCompare(String(b.rollNo), undefined, { numeric: true, sensitivity: 'base' });
-                });
-                
-                renderTable();
-            }, (error) => {
-                console.error("Error fetching students:", error);
-                showToast("Failed to load student roster", "error");
+                }
             });
         }
 
-        window.openModal = function() {
-            document.getElementById('add-student-modal').classList.remove('hidden');
-            setTimeout(() => document.getElementById('modalRollNo').focus(), 100);
-        };
-
-        window.closeModal = function() {
-            document.getElementById('add-student-modal').classList.add('hidden');
-            document.getElementById('modal-form').reset();
-        };
-
-        window.copyRegistrationLink = function() {
-            if (!currentUser) {
-                showToast("Please wait for cloud connection", "warning");
+        window.requestAttendanceAccess = async function() {
+            if (window.sessionLocked) {
+                showToast(`Function currently in use by ${window.lockedBy}`, 'warning');
                 return;
             }
-            const url = window.location.origin + window.location.pathname + '?mode=register&crid=' + currentUser.uid;
-            
-            const btnTextSpan = document.querySelector('#btn-copy-link span');
-            const originalText = btnTextSpan.innerText;
             
             try {
-                const textArea = document.createElement("textarea");
-                textArea.value = url;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                
-                btnTextSpan.innerText = 'Copied!';
-                showToast("Registration link copied!");
-                setTimeout(() => { btnTextSpan.innerText = originalText; }, 2000);
-            } catch (err) {
-                console.error('Copy failed', err);
-                showToast("Failed to copy link", "error");
+                const sessionRef = doc(db, 'class_roster', '_system_session_');
+                await setDoc(sessionRef, {
+                    activeCR: currentUserData.regNo,
+                    crName: currentUserData.name,
+                    timestamp: Date.now()
+                }, { merge: true });
+
+                document.getElementById('cr-home-cards').classList.add('hidden');
+                document.getElementById('attendance-workspace').classList.remove('hidden');
+                document.getElementById('attendance-workspace').classList.add('flex');
+            } catch(e) {
+                showToast("Error checking session", "error");
             }
         };
 
-        window.copyTextSummary = function() {
-            const textArea = document.getElementById('text-summary-output');
-            textArea.select();
-            document.execCommand('copy');
-            
-            const btn = document.getElementById('btn-copy-text');
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Copied!`;
-            showToast("Text copied to clipboard!");
-            
-            setTimeout(() => {
-                btn.innerHTML = originalHTML;
-            }, 2000);
+        window.releaseAttendanceAccess = async function() {
+            try {
+                const sessionRef = doc(db, 'class_roster', '_system_session_');
+                await setDoc(sessionRef, {
+                    activeCR: null,
+                    crName: null,
+                    timestamp: Date.now()
+                }, { merge: true });
+
+                document.getElementById('attendance-workspace').classList.add('hidden');
+                document.getElementById('attendance-workspace').classList.remove('flex');
+                document.getElementById('cr-home-cards').classList.remove('hidden');
+            } catch (err) {
+                showToast("Error closing session", "error");
+            }
         };
 
-        // Student self-registration form submit
-        document.getElementById('student-reg-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUser || !crid || !db) return;
 
+        // ---------- ANNOUNCEMENT LOGIC ---------- //
+        function listenToAnnouncements() {
+            onSnapshot(doc(db, 'class_roster', '_system_announcement_'), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    let list = data.list || [];
+                    if (data.text && list.length === 0) {
+                        list.push({ id: data.timestamp.toString(), text: data.text, timestamp: data.timestamp });
+                    }
+                    window.allAnnouncements = list.sort((a,b) => b.timestamp - a.timestamp);
+                } else {
+                    window.allAnnouncements = [];
+                }
+                renderAnnouncementsUI();
+            });
+        }
+
+        function renderAnnouncementsUI() {
+            const now = Date.now();
+            const oneWeek = 7 * 24 * 60 * 60 * 1000;
+            
+            const recent = window.allAnnouncements.filter(a => (now - a.timestamp) <= oneWeek);
+            const past = window.allAnnouncements.filter(a => (now - a.timestamp) > oneWeek);
+
+            renderList('student', recent, past);
+            renderList('cr', recent, past);
+        }
+
+        function renderList(prefix, recent, past) {
+            const recentContainer = document.getElementById(`${prefix}-recent-announcements`);
+            const pastContainer = document.getElementById(`${prefix}-past-announcements`);
+            const pastBtn = document.getElementById(`btn-${prefix}-past-announcements`);
+            
+            if(!recentContainer) return; 
+
+            const generateHTML = (list) => {
+                if(list.length === 0) return `<p class="text-gray-500 text-sm italic">No announcements to display.</p>`;
+                return list.map(a => `
+                    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded relative">
+                        <p class="text-gray-800 whitespace-pre-wrap font-medium text-sm">${escapeHtml(a.text)}</p>
+                        <div class="flex justify-between items-center mt-3 pt-3 border-t border-indigo-100">
+                            <p class="text-xs text-gray-500 font-semibold">${new Date(a.timestamp).toLocaleString()}</p>
+                            ${prefix === 'cr' ? `<button onclick="deleteAnnouncement('${a.id}')" class="text-red-500 hover:text-red-700 text-xs font-semibold underline">Delete</button>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            recentContainer.innerHTML = generateHTML(recent);
+            pastContainer.innerHTML = generateHTML(past);
+
+            if(past.length > 0) {
+                pastBtn.classList.remove('hidden');
+            } else {
+                pastBtn.classList.add('hidden');
+                pastContainer.classList.add('hidden');
+            }
+        }
+
+        window.togglePastAnnouncements = function(prefix) {
+            const el = document.getElementById(`${prefix}-past-announcements`);
+            const btn = document.getElementById(`btn-${prefix}-past-announcements`);
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                btn.innerText = 'Hide Past Announcements';
+            } else {
+                el.classList.add('hidden');
+                btn.innerText = 'View Past Announcements';
+            }
+        };
+
+        window.openAnnouncementListModal = function() {
+            document.getElementById('announcement-list-modal').classList.remove('hidden');
+        };
+
+        window.closeAnnouncementListModal = function() {
+            document.getElementById('announcement-list-modal').classList.add('hidden');
+        };
+
+        window.openAnnouncementDraftModal = function() {
+            closeAnnouncementListModal();
+            document.getElementById('announcement-draft-modal').classList.remove('hidden');
+        };
+
+        window.closeAnnouncementDraftModal = function() {
+            document.getElementById('announcement-draft-modal').classList.add('hidden');
+            openAnnouncementListModal();
+        };
+
+        window.publishAnnouncement = async function() {
+            const text = document.getElementById('announcement-input').value.trim();
+            if(!text) return;
+            
+            const btn = document.getElementById('btn-publish-announcement');
+            btn.innerText = 'Publishing...';
+            try {
+                const newAnn = { id: Date.now().toString(), text, timestamp: Date.now() };
+                const updatedList = [newAnn, ...window.allAnnouncements];
+                
+                await setDoc(doc(db, 'class_roster', '_system_announcement_'), { list: updatedList }, { merge: true });
+                showToast("Announcement published!");
+                
+                document.getElementById('announcement-input').value = '';
+                closeAnnouncementDraftModal();
+            } catch(e) {
+                showToast("Failed to publish", "error");
+            }
+            btn.innerText = 'Publish';
+        };
+
+        window.deleteAnnouncement = async function(id) {
+            if(!confirm("Delete this announcement? It will be removed from all student dashboards.")) return;
+            try {
+                const updatedList = window.allAnnouncements.filter(a => a.id !== id);
+                await setDoc(doc(db, 'class_roster', '_system_announcement_'), { list: updatedList }, { merge: true });
+                showToast("Announcement deleted");
+            } catch(e) {
+                showToast("Failed to delete", "error");
+            }
+        };
+        // ---------------------------------------- //
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const regNo = document.getElementById('loginRegNo').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+            const btn = e.target.querySelector('button');
+            btn.innerText = 'Verifying...';
+
+            try {
+                const docRef = doc(db, 'class_roster', regNo);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.password === pass) {
+                        currentUserData = data;
+                        document.getElementById('auth-view').style.display = 'none';
+                        listenToAnnouncements();
+
+                        if (data.role === 'cr') {
+                            document.getElementById('cr-view').style.display = 'flex';
+                            loadClassRoster();
+                            listenToSession(); 
+                        } else {
+                            document.getElementById('student-dashboard-view').style.display = 'flex';
+                            document.getElementById('student-welcome-text').innerText = 'Welcome back, ' + data.name;
+                        }
+                        showToast(`Welcome, ${data.name}!`);
+                    } else {
+                        showToast('Incorrect password', 'error');
+                    }
+                } else {
+                    showToast('Registration No not found. Please register.', 'error');
+                }
+            } catch (err) {
+                showToast("Connection error", "error");
+            }
+            btn.innerText = 'Login';
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
             const rollNo = document.getElementById('regRollNo').value.trim();
             const name = document.getElementById('regName').value.trim();
             const regNo = document.getElementById('regRegNo').value.trim();
-
-            const btn = document.getElementById('btn-student-submit');
-            btn.disabled = true;
-            btn.innerText = 'Submitting...';
-
-            try {
-                const studentsRef = collection(db, 'artifacts', appId, 'users', crid, 'students');
-                await addDoc(studentsRef, {
-                    rollNo: rollNo,
-                    name: name,
-                    regNo: regNo,
-                    createdAt: Date.now()
-                });
-                
-                document.getElementById('student-reg-form').classList.add('hidden');
-                document.getElementById('reg-success').classList.remove('hidden');
-            } catch (error) {
-                console.error("Registration Error:", error);
-                btn.disabled = false;
-                btn.innerText = 'Submit Registration';
-                showToast("Failed to submit registration", "error");
-            }
-        });
-
-        // CR add student form submit
-        document.getElementById('modal-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const rollNoInput = document.getElementById('modalRollNo');
-            const nameInput = document.getElementById('modalName');
-            const regNoInput = document.getElementById('modalRegNo');
+            const pass = document.getElementById('regPass').value.trim();
             
-            const rollNo = rollNoInput.value.trim();
-            const name = nameInput.value.trim();
-            const regNo = regNoInput.value.trim();
-            
-            if (!name || !rollNo || !regNo || !currentUser || !db) return;
-
-            const btn = document.getElementById('btn-save');
-            btn.disabled = true;
+            const btn = e.target.querySelector('button');
             btn.innerText = 'Saving...';
 
             try {
-                const studentsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'students');
-                await addDoc(studentsRef, {
-                    rollNo: rollNo,
-                    name: name,
-                    regNo: regNo,
-                    createdAt: Date.now()
-                });
-                showToast("Student added successfully");
-                closeModal();
-            } catch (error) {
-                console.error("Error adding student:", error);
-                showToast("Failed to add student", "error");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'Save';
+                const docRef = doc(db, 'class_roster', regNo);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    showToast('Registration No already exists. Please login.', 'warning');
+                } else {
+                    const snapshot = await getDocs(collection(db, 'class_roster'));
+                    let uCount = 0;
+                    snapshot.forEach(d => {
+                        if (d.id !== '_system_meta_' && d.id !== '_system_announcement_' && d.id !== '_system_session_') uCount++;
+                    });
+
+                    let role = 'student';
+                    let finalPass = pass;
+                    if (uCount === 0) {
+                        role = 'cr';
+                        finalPass = 'BiomedCR';
+                    }
+
+                    await setDoc(docRef, {
+                        rollNo, name, regNo, password: finalPass, role: role, createdAt: Date.now()
+                    });
+                    
+                    if (role === 'cr') {
+                        showToast('Master CR registered! You can now login.');
+                        window.isFirstUser = false;
+                    } else {
+                        showToast('Registration successful! You can now login.');
+                    }
+                    
+                    toggleAuthMode('login');
+                    document.getElementById('loginRegNo').value = regNo;
+                }
+            } catch (err) {
+                showToast("Registration failed", "error");
             }
+            btn.innerText = 'Register & Join';
         });
 
+        function loadClassRoster() {
+            const rosterRef = collection(db, 'class_roster');
+            onSnapshot(rosterRef, (snapshot) => {
+                studentsData = [];
+                snapshot.forEach((doc) => {
+                    if (doc.id === '_system_meta_' || doc.id === '_system_announcement_' || doc.id === '_system_session_') {
+                        if(doc.id === '_system_meta_') window.systemMeta = doc.data();
+                        return;
+                    }
+                    const data = doc.data();
+                    studentsData.push({ id: doc.id, ...data });
+                    if (!attendanceRecord[doc.id]) attendanceRecord[doc.id] = 'Present';
+                });
+                
+                studentsData.sort((a, b) => String(a.rollNo).localeCompare(String(b.rollNo), undefined, { numeric: true, sensitivity: 'base' }));
+                renderTable();
+            });
+        }
+
+        window.updateAttendance = function(studentId, isChecked) {
+            attendanceRecord[studentId] = isChecked ? 'Present' : 'Absent';
+        };
+
+        window.markAll = function(isPresent) {
+            studentsData.forEach(student => {
+                attendanceRecord[student.id] = isPresent ? 'Present' : 'Absent';
+            });
+            renderTable();
+            showToast(`Marked all students as ${isPresent ? 'Present' : 'Absent'}`);
+        };
+
         window.deleteStudent = async function(studentId) {
-            if (!currentUser || !db) return;
+            const student = studentsData.find(s => s.id === studentId);
+            if (student && student.role === 'cr') {
+                showToast("Cannot delete a CR account from the roster view.", "error");
+                return;
+            }
+            if(!confirm("Remove this student from the class roster?")) return;
             try {
-                const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'students', studentId);
-                await deleteDoc(docRef);
+                await deleteDoc(doc(db, 'class_roster', studentId));
                 delete attendanceRecord[studentId]; 
                 showToast("Student removed");
             } catch (error) {
-                console.error("Error deleting student:", error);
                 showToast("Failed to remove student", "error");
             }
         };
 
-        window.updateAttendance = function(studentId, status) {
-            attendanceRecord[studentId] = status;
-        };
-
         function renderTable() {
             const listEl = document.getElementById('student-list');
-            const countEl = document.getElementById('student-count');
-            
-            countEl.innerText = `${studentsData.length} Student${studentsData.length !== 1 ? 's' : ''}`;
+            document.getElementById('student-count').innerText = `${studentsData.length} Student${studentsData.length !== 1 ? 's' : ''}`;
             
             if (studentsData.length === 0) {
-                listEl.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="py-8 text-center text-gray-500 bg-white">
-                            No students in your roster. Add some above!
-                        </td>
-                    </tr>
-                `;
-                document.getElementById('btn-export').disabled = true;
+                listEl.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-500 bg-white">No students registered yet.</td></tr>`;
                 return;
             }
 
-            document.getElementById('btn-export').disabled = false;
             listEl.innerHTML = '';
-
             studentsData.forEach(student => {
                 const isPresent = attendanceRecord[student.id] === 'Present';
+                const roleBadge = student.role === 'cr' ? `<span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded ml-2 font-bold">CR</span>` : '';
                 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-blue-50 transition-colors bg-white';
                 tr.innerHTML = `
-                    <td class="py-3 px-4 text-gray-600 font-medium">
-                        ${escapeHtml(student.rollNo)}
-                    </td>
-                    <td class="py-3 px-4 text-gray-800 font-medium">
-                        ${escapeHtml(student.name)}
-                    </td>
-                    <td class="py-3 px-4 text-gray-500 text-sm">
-                        ${escapeHtml(student.regNo)}
-                    </td>
+                    <td class="py-3 px-4 text-gray-600 font-medium">${escapeHtml(student.rollNo)}</td>
+                    <td class="py-3 px-4 text-gray-800 font-medium">${escapeHtml(student.name)} ${roleBadge}</td>
+                    <td class="py-3 px-4 text-gray-500 text-sm">${escapeHtml(student.regNo)}</td>
                     <td class="py-3 px-4 text-center">
-                        <div class="inline-flex bg-gray-100 rounded-lg p-1 border border-gray-200">
-                            <label class="cursor-pointer relative flex items-center justify-center rounded-md px-3 py-1 ${isPresent ? 'bg-green-500 text-white shadow' : 'text-gray-500 hover:bg-gray-200'} transition-all">
-                                <input type="radio" name="status-${student.id}" value="Present" class="hidden" 
-                                    ${isPresent ? 'checked' : ''} onchange="updateAttendance('${student.id}', 'Present'); renderTable();">
-                                <span class="text-sm font-medium">Present</span>
-                            </label>
-                            <label class="cursor-pointer relative flex items-center justify-center rounded-md px-3 py-1 ${!isPresent ? 'bg-red-500 text-white shadow' : 'text-gray-500 hover:bg-gray-200'} transition-all">
-                                <input type="radio" name="status-${student.id}" value="Absent" class="hidden" 
-                                    ${!isPresent ? 'checked' : ''} onchange="updateAttendance('${student.id}', 'Absent'); renderTable();">
-                                <span class="text-sm font-medium">Absent</span>
-                            </label>
-                        </div>
+                        <input type="checkbox" class="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
+                            ${isPresent ? 'checked' : ''} 
+                            onchange="updateAttendance('${student.id}', this.checked); renderTable();">
                     </td>
                     <td class="py-3 px-4 text-right">
                         <button onclick="deleteStudent('${student.id}')" class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Remove Student">
@@ -562,152 +844,245 @@ const app = initializeApp(firebaseConfig);
             });
         }
 
+        window.openSettings = function() {
+            const promoteSelect = document.getElementById('cr-promote-select');
+            const promoteBtn = document.getElementById('btn-promote-cr');
+            const limitMsg = document.getElementById('cr-limit-msg');
+            
+            const transferSelect = document.getElementById('cr-transfer-select');
+            const transferBtn = document.getElementById('btn-transfer-cr');
+            const transferMsg = document.getElementById('cr-transfer-limit-msg');
+            
+            promoteSelect.innerHTML = '<option value="">-- Select Student to Promote --</option>';
+            transferSelect.innerHTML = '<option value="">-- Select Student for Transfer --</option>';
+            
+            let crCount = studentsData.filter(s => s.role === 'cr').length;
+            if (crCount >= 2) {
+                promoteSelect.disabled = true;
+                promoteBtn.disabled = true;
+                promoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                limitMsg.innerText = "Limit Reached: Maximum 2 CRs allowed.";
+                limitMsg.classList.add('text-red-500', 'font-semibold');
+            } else {
+                promoteSelect.disabled = false;
+                promoteBtn.disabled = false;
+                promoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                limitMsg.innerText = "Their password will change to 'BiomedCR'";
+                limitMsg.classList.remove('text-red-500', 'font-semibold');
+            }
+
+            if (window.systemMeta && window.systemMeta.transferUsed) {
+                transferSelect.disabled = true;
+                transferBtn.disabled = true;
+                transferBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                transferMsg.innerText = "Transfer feature has already been used once.";
+                transferMsg.classList.add('text-red-500', 'font-semibold');
+            } else {
+                transferSelect.disabled = false;
+                transferBtn.disabled = false;
+                transferBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                transferMsg.innerText = "You will become a student and log out.";
+                transferMsg.classList.remove('text-red-500', 'font-semibold');
+            }
+
+            studentsData.forEach(s => {
+                if (s.role !== 'cr') {
+                    const opt1 = document.createElement('option');
+                    opt1.value = s.regNo;
+                    opt1.innerText = `${s.name} (${s.regNo})`;
+                    promoteSelect.appendChild(opt1);
+                    
+                    const opt2 = document.createElement('option');
+                    opt2.value = s.regNo;
+                    opt2.innerText = `${s.name} (${s.regNo})`;
+                    transferSelect.appendChild(opt2);
+                }
+            });
+            document.getElementById('settings-modal').classList.remove('hidden');
+        };
+
+        window.closeSettings = function() {
+            document.getElementById('settings-modal').classList.add('hidden');
+        };
+
+        window.promoteToCR = async function() {
+            const select = document.getElementById('cr-promote-select');
+            const regNo = select.value;
+            if (!regNo) return;
+            
+            let crCount = studentsData.filter(s => s.role === 'cr').length;
+            if (crCount >= 2) {
+                showToast("Maximum 2 CRs allowed", "error");
+                return;
+            }
+            
+            try {
+                await updateDoc(doc(db, 'class_roster', regNo), { role: 'cr', password: 'BiomedCR' });
+                showToast("Student successfully promoted to CR!");
+                closeSettings();
+            } catch (err) {
+                showToast("Failed to promote student", "error");
+            }
+        };
+
+        window.transferCRRole = async function() {
+            const select = document.getElementById('cr-transfer-select');
+            const targetRegNo = select.value;
+            if (!targetRegNo) return;
+
+            if(window.systemMeta && window.systemMeta.transferUsed) {
+                showToast("Transfer role has already been used once.", "error");
+                return;
+            }
+
+            if(!confirm("Are you absolutely sure? You will permanently transfer your CR role to this student and become a regular student yourself.")) return;
+            
+            try {
+                await setDoc(doc(db, 'class_roster', '_system_meta_'), { transferUsed: true }, { merge: true });
+                await updateDoc(doc(db, 'class_roster', targetRegNo), { role: 'cr', password: 'BiomedCR' });
+                await updateDoc(doc(db, 'class_roster', currentUserData.regNo), { role: 'student', password: 'BiomedClass' });
+                
+                showToast("Role transferred successfully! Logging out...");
+                closeSettings();
+                setTimeout(() => logout(), 1500); 
+            } catch (err) {
+                showToast("Failed to transfer role", "error");
+            }
+        };
+
+        window.deleteAllStudents = async function() {
+            if(!confirm("WARNING: This will delete ALL non-CR students from the database. Are you sure?")) return;
+            try {
+                const q = query(collection(db, 'class_roster'), where('role', '==', 'student'));
+                const querySnapshot = await getDocs(q);
+                const deletePromises = [];
+                querySnapshot.forEach((d) => { deletePromises.push(deleteDoc(doc(db, 'class_roster', d.id))); });
+                await Promise.all(deletePromises);
+                showToast("All student entries deleted.");
+                closeSettings();
+            } catch (err) {
+                showToast("Error deleting students", "error");
+            }
+        };
+
+        window.deleteCRDashboard = async function() {
+            if(!confirm("CRITICAL WARNING: This will permanently wipe the entire class roster, including all CR accounts. You will be logged out. Are you absolutely sure?")) return;
+            try {
+                const querySnapshot = await getDocs(collection(db, 'class_roster'));
+                const deletePromises = [];
+                querySnapshot.forEach((d) => { deletePromises.push(deleteDoc(doc(db, 'class_roster', d.id))); });
+                await Promise.all(deletePromises);
+                showToast("Dashboard completely deleted.");
+                closeSettings();
+                logout();
+            } catch (err) {
+                showToast("Error deleting dashboard", "error");
+            }
+        };
+
+        window.copyStudentLink = function() {
+            const url = window.location.origin + window.location.pathname;
+            const textArea = document.createElement("textarea");
+            textArea.value = url;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast("Students Dashboard link copied!");
+        };
+
         function escapeHtml(unsafe) {
-            return unsafe
-                 .replace(/&/g, "&amp;")
-                 .replace(/</g, "&lt;")
-                 .replace(/>/g, "&gt;")
-                 .replace(/"/g, "&quot;")
-                 .replace(/'/g, "&#039;");
+            return String(unsafe).replace(/[&<"'>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c]));
         }
 
         window.exportToPDF = function() {
             if (studentsData.length === 0) return;
-
             const btn = document.getElementById('btn-export');
-            btn.innerHTML = 'Generating...';
-            btn.disabled = true;
+            btn.innerHTML = 'Generating...'; btn.disabled = true;
 
             const courseName = document.getElementById('courseName').value.trim() || 'Unnamed Course';
             const className = document.getElementById('className').value.trim() || 'Unnamed Class';
+            const eventName = document.getElementById('eventTopic').value.trim();
             const dateVal = document.getElementById('classDate').value;
-            const dateObj = new Date(dateVal);
-            const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : dateVal;
+            const formattedDate = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
             
-            const filename = `Attendance of ${dateVal}, ${className}.pdf`;
-
-            const container = document.getElementById('pdf-container');
-            
-            const presentStudents = [];
-            const absentStudents = [];
-            
+            const presentStudents = [], absentStudents = [];
             studentsData.forEach(student => {
-                const status = attendanceRecord[student.id] || 'Present';
-                if (status === 'Present') {
-                    presentStudents.push(student);
-                } else {
-                    absentStudents.push(student);
-                }
+                if ((attendanceRecord[student.id] || 'Present') === 'Present') presentStudents.push(student);
+                else absentStudents.push(student);
             });
             
-            // Generate Plain Text Summary
-            let textSummary = `Attendance Report\n`;
-            textSummary += `=====================\n`;
-            textSummary += `Course: ${courseName}\n`;
-            textSummary += `Class:  ${className}\n`;
-            textSummary += `Date:   ${formattedDate}\n\n`;
-
-            textSummary += `PRESENT (${presentStudents.length}):\n`;
-            textSummary += `---------------------\n`;
+            let textSummary = `Attendance Report\n=====================\nCourse: ${courseName}\nClass:  ${className}\n`;
+            if (eventName) textSummary += `Event:  ${eventName}\n`;
+            textSummary += `Date:   ${formattedDate}\n\nPRESENT (${presentStudents.length}):\n---------------------\n`;
+            
             if (presentStudents.length === 0) textSummary += `(None)\n`;
-            presentStudents.forEach(s => {
-                textSummary += `${s.rollNo}\t- ${s.name} (${s.regNo})\n`;
-            });
-
-            textSummary += `\nABSENT (${absentStudents.length}):\n`;
-            textSummary += `---------------------\n`;
+            presentStudents.forEach(s => textSummary += `${s.rollNo}\t- ${s.name} (${s.regNo})\n`);
+            
+            textSummary += `\nABSENT (${absentStudents.length}):\n---------------------\n`;
             if (absentStudents.length === 0) textSummary += `(None)\n`;
-            absentStudents.forEach(s => {
-                textSummary += `${s.rollNo}\t- ${s.name} (${s.regNo})\n`;
-            });
+            absentStudents.forEach(s => textSummary += `${s.rollNo}\t- ${s.name} (${s.regNo})\n`);
 
-            // Set Text Summary into UI and reveal section
             document.getElementById('text-summary-output').value = textSummary;
             document.getElementById('text-summary-section').classList.remove('hidden');
 
-            // HTML generator for PDF
+            const container = document.getElementById('pdf-container');
             const generateTableHTML = (students, title, color) => {
-                if (students.length === 0) return `<p style="color: #6b7280; font-style: italic; margin-top: 10px; font-size: 14px;">No students in this list.</p>`;
-                
-                const rows = students.map(student => `
+                if (students.length === 0) return `<p style="color: #6b7280; font-style: italic; margin-top: 10px; font-size: 14px;">No students.</p>`;
+                const rows = students.map(s => `
                     <tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 10px; text-align: left; color: #374151; font-size: 13px;">${escapeHtml(student.rollNo)}</td>
-                        <td style="padding: 10px; text-align: left; color: #111827; font-weight: 500; font-size: 13px;">${escapeHtml(student.name)}</td>
-                        <td style="padding: 10px; text-align: left; color: #6b7280; font-size: 13px;">${escapeHtml(student.regNo)}</td>
-                    </tr>
-                `).join('');
-                
+                        <td style="padding: 10px; text-align: left; color: #374151; font-size: 13px;">${escapeHtml(s.rollNo)}</td>
+                        <td style="padding: 10px; text-align: left; color: #111827; font-weight: 500; font-size: 13px;">${escapeHtml(s.name)}</td>
+                        <td style="padding: 10px; text-align: left; color: #6b7280; font-size: 13px;">${escapeHtml(s.regNo)}</td>
+                    </tr>`).join('');
                 return `
                     <div style="margin-bottom: 20px;">
                         <h3 style="color: ${color}; font-size: 18px; border-bottom: 2px solid ${color}; padding-bottom: 5px; margin-bottom: 10px;">${title} (${students.length})</h3>
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead>
                                 <tr style="background-color: #f8fafc; border-bottom: 2px solid #cbd5e1;">
-                                    <th style="padding: 10px; text-align: left; color: #475569; font-size: 12px; text-transform: uppercase; width: 25%;">Roll No</th>
-                                    <th style="padding: 10px; text-align: left; color: #475569; font-size: 12px; text-transform: uppercase; width: 45%;">Name</th>
-                                    <th style="padding: 10px; text-align: left; color: #475569; font-size: 12px; text-transform: uppercase; width: 30%;">Reg No</th>
+                                    <th style="padding: 10px; text-align: left; font-size: 12px;">Roll No</th>
+                                    <th style="padding: 10px; text-align: left; font-size: 12px;">Name</th>
+                                    <th style="padding: 10px; text-align: left; font-size: 12px;">Reg No</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                ${rows}
-                            </tbody>
+                            <tbody>${rows}</tbody>
                         </table>
-                    </div>
-                `;
+                    </div>`;
             };
 
+            const eventHtml = eventName ? `<h3 style="color: #4b5563; margin: 0 0 8px 0; font-size: 16px; font-weight: normal;">Event: ${escapeHtml(eventName)}</h3>` : '';
+
             container.innerHTML = `
-                <div style="padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff;">
+                <div style="padding: 40px; font-family: sans-serif; background: #ffffff;">
                     <div style="text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 25px;">
                         <h1 style="color: #1e3a8a; margin: 0 0 10px 0; font-size: 24px;">Class Attendance Report</h1>
                         <h2 style="color: #374151; margin: 0 0 5px 0; font-size: 18px; font-weight: bold;">Course: ${escapeHtml(courseName)}</h2>
                         <h3 style="color: #4b5563; margin: 0 0 8px 0; font-size: 16px; font-weight: normal;">Class/Subject: ${escapeHtml(className)}</h3>
+                        ${eventHtml}
                         <p style="color: #6b7280; margin: 0; font-size: 14px;">Date: ${formattedDate}</p>
                     </div>
-                    
                     <div style="display: flex; gap: 30px; align-items: flex-start;">
-                        <div style="flex: 1; min-width: 0;">
-                            ${generateTableHTML(presentStudents, 'Present Students', '#15803d')}
-                        </div>
-                        <div style="flex: 1; min-width: 0;">
-                            ${generateTableHTML(absentStudents, 'Absent Students', '#b91c1c')}
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 40px; text-align: right; padding-top: 15px; border-top: 1px solid #e5e7eb;">
-                        <p style="color: #9ca3af; font-size: 12px; font-style: italic;">Generated by Class Attendance Manager</p>
+                        <div style="flex: 1; min-width: 0;">${generateTableHTML(presentStudents, 'Present Students', '#15803d')}</div>
+                        <div style="flex: 1; min-width: 0;">${generateTableHTML(absentStudents, 'Absent Students', '#b91c1c')}</div>
                     </div>
                 </div>
             `;
-
             container.classList.remove('hidden');
 
-            const opt = {
-                margin:       0,
-                filename:     filename,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Generate and trigger download
-            html2pdf().set(opt).from(container).save().then(() => {
-                container.classList.add('hidden');
-                container.innerHTML = '';
-                
-                btn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
-                    </svg>
-                    Export PDF
-                `;
-                btn.disabled = false;
-                showToast("PDF Exported and Text Summary generated!");
-                
-                // Scroll down to text summary
+            html2pdf().set({ margin: 0, filename: `Attendance of ${dateVal}, ${className}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(container).save().then(() => {
+                container.classList.add('hidden'); container.innerHTML = '';
+                btn.innerHTML = 'Export PDF'; btn.disabled = false;
+                showToast("PDF Exported!");
                 document.getElementById('text-summary-section').scrollIntoView({ behavior: 'smooth' });
             });
-        }
+        };
+        
+        window.copyTextSummary = function() {
+            document.getElementById('text-summary-output').select();
+            document.execCommand('copy');
+            showToast("Text copied to clipboard!");
+        };
     </script>
 </body>
 </html>
