@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Attendance Manager</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Custom scrollbar for table */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+        /* Toast animation */
+        @keyframes slideIn {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col items-center py-8 px-4">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+    <div id="student-view" class="hidden w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200">
+        <div class="bg-blue-600 text-white px-6 py-5 text-center">
+            <h1 class="text-2xl font-bold">Class Registration</h1>
+            <p class="text-blue-100 text-sm mt-1">Enter your details to join the roster</p>
+        </div>
+        <div class="p-6">
+            <form id="student-reg-form" class="space-y-4">
+                <div>
+                    <label for="regRollNo" class="block text-sm font-medium text-gray-700 mb-1">Roll No</label>
+                    <input type="text" id="regRollNo" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                </div>
+                <div>
+                    <label for="regName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="regName" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                </div>
+                <div>
+                    <label for="regRegNo" class="block text-sm font-medium text-gray-700 mb-1">Registration No</label>
+                    <input type="text" id="regRegNo" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                </div>
+                <button type="submit" id="btn-student-submit" disabled class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    Submit Registration
+                </button>
+            </form>
+            <div id="reg-success" class="hidden text-center py-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                    <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Registration Successful!</h2>
+                <p class="text-gray-600">Your details have been added to the class roster. You can safely close this page.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="cr-view" class="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
+        <div class="bg-blue-600 text-white px-6 py-5 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold">Class Attendance Manager</h1>
+                <p class="text-blue-100 text-sm mt-1">Class Representative Dashboard</p>
+            </div>
+            <div id="auth-status" class="text-sm font-medium bg-blue-700 px-3 py-1 rounded-full flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" id="auth-indicator"></span>
+                <span id="auth-text">Connecting...</span>
+            </div>
+        </div>
+
+        <div class="p-6 flex-grow flex flex-col gap-6">
+            
+            <!-- Class Details Inputs -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div>
+                    <label for="courseName" class="block text-sm font-semibold text-gray-700 mb-1">Course</label>
+                    <input type="text" id="courseName" placeholder="e.g., B.Tech / B.Sc" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                </div>
+                <div>
+                    <label for="className" class="block text-sm font-semibold text-gray-700 mb-1">Class Name / Subject</label>
+                    <input type="text" id="className" placeholder="e.g., Computer Science 101" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                </div>
+                <div>
+                    <label for="classDate" class="block text-sm font-semibold text-gray-700 mb-1">Date</label>
+                    <input type="date" id="classDate" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <div>
+                    <h2 class="text-lg font-semibold text-blue-900">Student Roster</h2>
+                    <p class="text-xs text-blue-600 mt-1">Manage your class list here.</p>
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="copyRegistrationLink()" id="btn-copy-link"
+                            class="flex-1 sm:flex-none bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-md font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                        <span>Copy Link</span>
+                    </button>
+                    <button onclick="openModal()" 
+                            class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors shadow-sm"
+                            id="btn-open-modal">
+                        + Add Student
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="flex-grow border border-gray-200 rounded-lg overflow-hidden flex flex-col">
+                <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="font-semibold text-gray-700">Student Roll Call</h2>
+                    <span id="student-count" class="text-sm text-gray-500 bg-white px-2 py-1 rounded border border-gray-200">0 Students</span>
+                </div>
+                <div class="overflow-y-auto table-container flex-grow max-h-[40vh]">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b w-20">Roll No</th>
+                                <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b">Name</th>
+                                <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b">Reg No</th>
+                                <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b text-center">Status</th>
+                                <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-list" class="divide-y divide-gray-100">
+                            <tr>
+                                <td colspan="5" class="py-8 text-center text-gray-400">
+                                    Loading roster...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-4 border-t border-gray-200">
+                <button onclick="exportToPDF()" id="btn-export"
+                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium shadow-md transition-all flex items-center gap-2 transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                    </svg>
+                    Export PDF
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Text Summary Section (Hidden by default, shown after export) -->
+    <div id="text-summary-section" class="w-full max-w-4xl bg-white rounded-xl shadow-md overflow-hidden flex flex-col mt-6 hidden border border-gray-200">
+        <div class="bg-gray-100 px-6 py-3 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="font-bold text-gray-700 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                Plain Text Summary
+            </h2>
+            <button onclick="copyTextSummary()" id="btn-copy-text"
+                    class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-1.5 rounded-md font-medium text-sm transition-colors shadow-sm flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                Copy Text
+            </button>
+        </div>
+        <div class="p-4">
+            <textarea id="text-summary-output" class="w-full h-64 p-4 bg-gray-50 border border-gray-300 rounded-md font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" readonly></textarea>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div id="add-student-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-blue-600 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-white">Add New Student</h3>
+                <button onclick="closeModal()" class="text-blue-200 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="modal-form" class="p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="modalRollNo" class="block text-sm font-medium text-gray-700 mb-1">Roll No</label>
+                        <input type="text" id="modalRollNo" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label for="modalName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input type="text" id="modalName" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label for="modalRegNo" class="block text-sm font-medium text-gray-700 mb-1">Reg No</label>
+                        <input type="text" id="modalRegNo" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors font-medium">Cancel</button>
+                    <button type="submit" id="btn-save" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors font-medium">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden template for generating PDF styling -->
+    <div id="pdf-container" class="hidden"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Environment variables
+        const firebaseConfig = {
+  apiKey: "AIzaSyD-gJXLGlrNbgG7MHFOCU93FVFBI8d16aU",
+  authDomain: "attendance-register-c8448.firebaseapp.com",
+  projectId: "attendance-register-c8448",
+  storageBucket: "attendance-register-c8448.firebasestorage.app",
+  messagingSenderId: "180898823565",
+  appId: "1:180898823565:web:077a2e4b6d9a03bbc911c4",
+  measurementId: "G-FLVLVZ9JMJ"
+};
+
+const app = initializeApp(firebaseConfig);
+
+
+        // Routing setup
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode');
+        const crid = urlParams.get('crid');
+
+        let db, auth;
+        let currentUser = null;
+        let studentsData = [];
+        let attendanceRecord = {}; 
+
+        // Setup defaults
+        document.getElementById('classDate').valueAsDate = new Date();
+
+        window.showToast = function(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'error' ? 'bg-red-500' : (type === 'warning' ? 'bg-yellow-500' : 'bg-green-500');
+            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg font-medium toast-enter pointer-events-auto flex items-center gap-2`;
+            
+            // Icon
+            const icon = type === 'error' ? `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+                       : `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+            
+            toast.innerHTML = `${icon} <span>${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-100%)';
+                toast.style.transition = 'all 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize Firebase
+        if (firebaseConfig) {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            
+            if (mode === 'register' && crid) {
+                document.getElementById('cr-view').classList.add('hidden');
+                document.getElementById('text-summary-section').classList.add('hidden');
+                document.getElementById('student-view').classList.remove('hidden');
+                document.getElementById('student-view').classList.add('flex', 'flex-col');
+            }
+            
+            authenticateUser();
+        } else {
+            updateAuthStatus('Offline Mode', 'bg-red-400');
+            renderTable(); 
+        }
+
+        async function authenticateUser() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUser = user;
+                        updateAuthStatus('Cloud Synced', 'bg-green-400');
+                        
+                        if (mode === 'register') {
+                            document.getElementById('btn-student-submit').disabled = false;
+                        } else {
+                            loadStudents();
+                        }
+                    } else {
+                        updateAuthStatus('Disconnected', 'bg-red-400');
+                    }
+                });
+            } catch (error) {
+                console.error("Auth Error:", error);
+                updateAuthStatus('Auth Failed', 'bg-red-400');
+                showToast("Authentication Failed", "error");
+            }
+        }
+
+        function updateAuthStatus(text, colorClass) {
+            document.getElementById('auth-text').innerText = text;
+            const indicator = document.getElementById('auth-indicator');
+            indicator.className = `w-2 h-2 rounded-full ${colorClass}`;
+            if(colorClass === 'bg-green-400') indicator.classList.add('animate-pulse');
+        }
+
+        function loadStudents() {
+            if (!currentUser || !db) return;
+
+            const studentsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'students');
+            
+            onSnapshot(studentsRef, (snapshot) => {
+                studentsData = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    studentsData.push({ 
+                        id: doc.id, 
+                        rollNo: data.rollNo || '',
+                        name: data.name, 
+                        regNo: data.regNo || '',
+                        createdAt: data.createdAt 
+                    });
+                    
+                    if (!attendanceRecord[doc.id]) {
+                        attendanceRecord[doc.id] = 'Present';
+                    }
+                });
+                
+                // Sort locally by Roll No naturally (e.g. '2' comes before '10')
+                studentsData.sort((a, b) => {
+                    return String(a.rollNo).localeCompare(String(b.rollNo), undefined, { numeric: true, sensitivity: 'base' });
+                });
+                
+                renderTable();
+            }, (error) => {
+                console.error("Error fetching students:", error);
+                showToast("Failed to load student roster", "error");
+            });
+        }
+
+        window.openModal = function() {
+            document.getElementById('add-student-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('modalRollNo').focus(), 100);
+        };
+
+        window.closeModal = function() {
+            document.getElementById('add-student-modal').classList.add('hidden');
+            document.getElementById('modal-form').reset();
+        };
+
+        window.copyRegistrationLink = function() {
+            if (!currentUser) {
+                showToast("Please wait for cloud connection", "warning");
+                return;
+            }
+            const url = window.location.origin + window.location.pathname + '?mode=register&crid=' + currentUser.uid;
+            
+            const btnTextSpan = document.querySelector('#btn-copy-link span');
+            const originalText = btnTextSpan.innerText;
+            
+            try {
+                const textArea = document.createElement("textarea");
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                btnTextSpan.innerText = 'Copied!';
+                showToast("Registration link copied!");
+                setTimeout(() => { btnTextSpan.innerText = originalText; }, 2000);
+            } catch (err) {
+                console.error('Copy failed', err);
+                showToast("Failed to copy link", "error");
+            }
+        };
+
+        window.copyTextSummary = function() {
+            const textArea = document.getElementById('text-summary-output');
+            textArea.select();
+            document.execCommand('copy');
+            
+            const btn = document.getElementById('btn-copy-text');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Copied!`;
+            showToast("Text copied to clipboard!");
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+            }, 2000);
+        };
+
+        // Student self-registration form submit
+        document.getElementById('student-reg-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser || !crid || !db) return;
+
+            const rollNo = document.getElementById('regRollNo').value.trim();
+            const name = document.getElementById('regName').value.trim();
+            const regNo = document.getElementById('regRegNo').value.trim();
+
+            const btn = document.getElementById('btn-student-submit');
+            btn.disabled = true;
+            btn.innerText = 'Submitting...';
+
+            try {
+                const studentsRef = collection(db, 'artifacts', appId, 'users', crid, 'students');
+                await addDoc(studentsRef, {
+                    rollNo: rollNo,
+                    name: name,
+                    regNo: regNo,
+                    createdAt: Date.now()
+                });
+                
+                document.getElementById('student-reg-form').classList.add('hidden');
+                document.getElementById('reg-success').classList.remove('hidden');
+            } catch (error) {
+                console.error("Registration Error:", error);
+                btn.disabled = false;
+                btn.innerText = 'Submit Registration';
+                showToast("Failed to submit registration", "error");
+            }
+        });
+
+        // CR add student form submit
+        document.getElementById('modal-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const rollNoInput = document.getElementById('modalRollNo');
+            const nameInput = document.getElementById('modalName');
+            const regNoInput = document.getElementById('modalRegNo');
+            
+            const rollNo = rollNoInput.value.trim();
+            const name = nameInput.value.trim();
+            const regNo = regNoInput.value.trim();
+            
+            if (!name || !rollNo || !regNo || !currentUser || !db) return;
+
+            const btn = document.getElementById('btn-save');
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
+            try {
+                const studentsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'students');
+                await addDoc(studentsRef, {
+                    rollNo: rollNo,
+                    name: name,
+                    regNo: regNo,
+                    createdAt: Date.now()
+                });
+                showToast("Student added successfully");
+                closeModal();
+            } catch (error) {
+                console.error("Error adding student:", error);
+                showToast("Failed to add student", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Save';
+            }
+        });
+
+        window.deleteStudent = async function(studentId) {
+            if (!currentUser || !db) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'students', studentId);
+                await deleteDoc(docRef);
+                delete attendanceRecord[studentId]; 
+                showToast("Student removed");
+            } catch (error) {
+                console.error("Error deleting student:", error);
+                showToast("Failed to remove student", "error");
+            }
+        };
+
+        window.updateAttendance = function(studentId, status) {
+            attendanceRecord[studentId] = status;
+        };
+
+        function renderTable() {
+            const listEl = document.getElementById('student-list');
+            const countEl = document.getElementById('student-count');
+            
+            countEl.innerText = `${studentsData.length} Student${studentsData.length !== 1 ? 's' : ''}`;
+            
+            if (studentsData.length === 0) {
+                listEl.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-gray-500 bg-white">
+                            No students in your roster. Add some above!
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('btn-export').disabled = true;
+                return;
+            }
+
+            document.getElementById('btn-export').disabled = false;
+            listEl.innerHTML = '';
+
+            studentsData.forEach(student => {
+                const isPresent = attendanceRecord[student.id] === 'Present';
+                
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-blue-50 transition-colors bg-white';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-gray-600 font-medium">
+                        ${escapeHtml(student.rollNo)}
+                    </td>
+                    <td class="py-3 px-4 text-gray-800 font-medium">
+                        ${escapeHtml(student.name)}
+                    </td>
+                    <td class="py-3 px-4 text-gray-500 text-sm">
+                        ${escapeHtml(student.regNo)}
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="inline-flex bg-gray-100 rounded-lg p-1 border border-gray-200">
+                            <label class="cursor-pointer relative flex items-center justify-center rounded-md px-3 py-1 ${isPresent ? 'bg-green-500 text-white shadow' : 'text-gray-500 hover:bg-gray-200'} transition-all">
+                                <input type="radio" name="status-${student.id}" value="Present" class="hidden" 
+                                    ${isPresent ? 'checked' : ''} onchange="updateAttendance('${student.id}', 'Present'); renderTable();">
+                                <span class="text-sm font-medium">Present</span>
+                            </label>
+                            <label class="cursor-pointer relative flex items-center justify-center rounded-md px-3 py-1 ${!isPresent ? 'bg-red-500 text-white shadow' : 'text-gray-500 hover:bg-gray-200'} transition-all">
+                                <input type="radio" name="status-${student.id}" value="Absent" class="hidden" 
+                                    ${!isPresent ? 'checked' : ''} onchange="updateAttendance('${student.id}', 'Absent'); renderTable();">
+                                <span class="text-sm font-medium">Absent</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="deleteStudent('${student.id}')" class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Remove Student">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                listEl.appendChild(tr);
+            });
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        window.exportToPDF = function() {
+            if (studentsData.length === 0) return;
+
+            const btn = document.getElementById('btn-export');
+            btn.innerHTML = 'Generating...';
+            btn.disabled = true;
+
+            const courseName = document.getElementById('courseName').value.trim() || 'Unnamed Course';
+            const className = document.getElementById('className').value.trim() || 'Unnamed Class';
+            const dateVal = document.getElementById('classDate').value;
+            const dateObj = new Date(dateVal);
+            const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : dateVal;
+            
+            const filename = `Attendance of ${dateVal}, ${className}.pdf`;
+
+            const container = document.getElementById('pdf-container');
+            
+            const presentStudents = [];
+            const absentStudents = [];
+            
+            studentsData.forEach(student => {
+                const status = attendanceRecord[student.id] || 'Present';
+                if (status === 'Present') {
+                    presentStudents.push(student);
+                } else {
+                    absentStudents.push(student);
+                }
+            });
+            
+            // Generate Plain Text Summary
+            let textSummary = `Attendance Report\n`;
+            textSummary += `=====================\n`;
+            textSummary += `Course: ${courseName}\n`;
+            textSummary += `Class:  ${className}\n`;
+            textSummary += `Date:   ${formattedDate}\n\n`;
+
+            textSummary += `PRESENT (${presentStudents.length}):\n`;
+            textSummary += `---------------------\n`;
+            if (presentStudents.length === 0) textSummary += `(None)\n`;
+            presentStudents.forEach(s => {
+                textSummary += `${s.rollNo}\t- ${s.name} (${s.regNo})\n`;
+            });
+
+            textSummary += `\nABSENT (${absentStudents.length}):\n`;
+            textSummary += `---------------------\n`;
+            if (absentStudents.length === 0) textSummary += `(None)\n`;
+            absentStudents.forEach(s => {
+                textSummary += `${s.rollNo}\t- ${s.name} (${s.regNo})\n`;
+            });
+
+            // Set Text Summary into UI and reveal section
+            document.getElementById('text-summary-output').value = textSummary;
+            document.getElementById('text-summary-section').classList.remove('hidden');
+
+            // HTML generator for PDF
+            const generateTableHTML = (students, title, color) => {
+                if (students.length === 0) return `<p style="color: #6b7280; font-style: italic; margin-top: 10px; font-size: 14px;">No students in this list.</p>`;
+                
+                const rows = students.map(student => `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 10px; text-align: left; color: #374151; font-size: 13px;">${escapeHtml(student.rollNo)}</td>
+                        <td style="padding: 10px; text-align: left; color: #111827; font-weight: 500; font-size: 13px;">${escapeHtml(student.name)}</td>
+                        <td style="padding: 10px; text-align: left; color: #6b7280; font-size: 13px;">${escapeHtml(student.regNo)}</td>
+                    </tr>
+                `).join('');
+                
+                return `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: ${color}; font-size: 18px; border-bottom: 2px solid ${color}; padding-bottom: 5px; margin-bottom: 10px;">${title} (${students.length})</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color: #f8fafc; border-bottom: 2px solid #cbd5e1;">
+                                    <th style="padding: 10px; text-align: left; color: #475569; font-size: 12px; text-transform: uppercase; width: 25%;">Roll No</th>
+                                    <th style="padding: 10px; text-align: left; color: #475569; font-size: 12px; text-transform: uppercase; width: 45%;">Name</th>
+                                    <th style="padding: 10px; text-align: left; color: #475569; font-size: 12px; text-transform: uppercase; width: 30%;">Reg No</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            };
+
+            container.innerHTML = `
+                <div style="padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff;">
+                    <div style="text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 25px;">
+                        <h1 style="color: #1e3a8a; margin: 0 0 10px 0; font-size: 24px;">Class Attendance Report</h1>
+                        <h2 style="color: #374151; margin: 0 0 5px 0; font-size: 18px; font-weight: bold;">Course: ${escapeHtml(courseName)}</h2>
+                        <h3 style="color: #4b5563; margin: 0 0 8px 0; font-size: 16px; font-weight: normal;">Class/Subject: ${escapeHtml(className)}</h3>
+                        <p style="color: #6b7280; margin: 0; font-size: 14px;">Date: ${formattedDate}</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 30px; align-items: flex-start;">
+                        <div style="flex: 1; min-width: 0;">
+                            ${generateTableHTML(presentStudents, 'Present Students', '#15803d')}
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            ${generateTableHTML(absentStudents, 'Absent Students', '#b91c1c')}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 40px; text-align: right; padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                        <p style="color: #9ca3af; font-size: 12px; font-style: italic;">Generated by Class Attendance Manager</p>
+                    </div>
+                </div>
+            `;
+
+            container.classList.remove('hidden');
+
+            const opt = {
+                margin:       0,
+                filename:     filename,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Generate and trigger download
+            html2pdf().set(opt).from(container).save().then(() => {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+                
+                btn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                    </svg>
+                    Export PDF
+                `;
+                btn.disabled = false;
+                showToast("PDF Exported and Text Summary generated!");
+                
+                // Scroll down to text summary
+                document.getElementById('text-summary-section').scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+    </script>
+</body>
+</html>
