@@ -25,13 +25,68 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- 1. AUTHENTICATION VIEW -->
-    <div id="auth-view" class="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200 transition-all">
-        <div class="bg-blue-600 text-white px-6 py-5 text-center relative">
-            <h1 class="text-2xl font-bold" id="auth-title">Welcome Back</h1>
-            <p class="text-blue-100 text-sm mt-1" id="auth-subtitle">Login to access your dashboard</p>
+    <!-- 0. CLASS SELECTION VIEW (Gateway) -->
+    <div id="class-selection-view" class="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200 transition-all">
+        <div class="bg-blue-800 text-white px-6 py-5 text-center relative">
+            <h1 class="text-2xl font-bold">Class Portal</h1>
+            <p class="text-blue-200 text-sm mt-1">Enter your Class Code to begin</p>
         </div>
         <div class="p-6">
+            <form id="class-form" class="space-y-4">
+                <div>
+                    <label for="classIdInput" class="block text-sm font-medium text-gray-700 mb-1">Class Code</label>
+                    <input type="text" id="classIdInput" required placeholder="e.g., CS101, BIOMED-A" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-colors uppercase">
+                </div>
+                <button type="submit" class="w-full mt-6 bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-bold shadow-md transition-all">Continue</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 0.5 CLASS SETUP VIEW (For New Classes) -->
+    <div id="class-setup-view" class="hidden w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200 transition-all">
+        <div class="bg-indigo-700 text-white px-6 py-5 text-center relative">
+            <h1 class="text-2xl font-bold">Initialize New Class</h1>
+            <p class="text-indigo-200 text-sm mt-1 font-mono" id="setup-class-name"></p>
+        </div>
+        <div class="p-6">
+            <p class="text-sm text-gray-600 mb-4 text-center">This class does not exist yet. Register to create it and become the Master CR.</p>
+            <form id="setup-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="setupRollNo" class="block text-sm font-medium text-gray-700 mb-1">Your Roll No</label>
+                        <input type="text" id="setupRollNo" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label for="setupRegNo" class="block text-sm font-medium text-gray-700 mb-1">Your Reg No</label>
+                        <input type="text" id="setupRegNo" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label for="setupName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="setupName" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="space-y-4 pt-4 border-t border-gray-200 mt-4">
+                    <div>
+                        <label for="setupPassCR" class="block text-sm font-medium text-gray-700 mb-1">Create Your Password</label>
+                        <input type="password" id="setupPassCR" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Enter secure password">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2 mt-6">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Create Class & Login</button>
+                    <button type="button" onclick="goBackToClassSelection()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-bold transition-all">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 1. AUTHENTICATION VIEW (For Existing Classes) -->
+    <div id="auth-view" class="hidden w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200 transition-all">
+        <div class="bg-blue-600 text-white px-6 py-4 text-center relative">
+            <h1 class="text-2xl font-bold" id="auth-title">Welcome Back</h1>
+            <p class="text-blue-100 text-sm mt-1 font-mono" id="auth-class-indicator"></p>
+        </div>
+        <div class="p-6">
+            <!-- Login Form -->
             <form id="login-form" class="space-y-4">
                 <div>
                     <label for="loginRegNo" class="block text-sm font-medium text-gray-700 mb-1">Registration No</label>
@@ -41,12 +96,27 @@
                     <label for="loginPass" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                     <input type="password" id="loginPass" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
                 </div>
-                <button type="submit" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Login</button>
+                <div class="flex flex-col gap-2 mt-6">
+                    <button type="submit" id="btn-login-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Login</button>
+                    <button type="button" onclick="goBackToClassSelection()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-bold transition-all">Change Class</button>
+                </div>
                 <div class="text-center mt-4 text-sm text-gray-600">
-                    New student? <a href="#" onclick="toggleAuthMode('register')" class="text-blue-600 font-semibold hover:underline">Register here</a>
+                    New student or Forgot Password? <a href="#" onclick="toggleAuthMode('register')" class="text-blue-600 font-semibold hover:underline">Register/Reset here</a>
                 </div>
             </form>
 
+            <!-- Password Reset Form -->
+            <form id="password-reset-form" class="space-y-4 hidden">
+                <p class="text-sm text-green-600 mb-4 font-semibold text-center border border-green-200 bg-green-50 py-2 rounded-md">Your password reset request was approved.</p>
+                <div>
+                    <label for="newResetPass" class="block text-sm font-medium text-gray-700 mb-1">Create New Password</label>
+                    <input type="password" id="newResetPass" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <button type="submit" class="w-full mt-6 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Save Password & Login</button>
+                <button type="button" onclick="cancelResetMode()" class="w-full mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-bold transition-all">Cancel</button>
+            </form>
+
+            <!-- Register Form -->
             <form id="register-form" class="space-y-4 hidden">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -62,27 +132,14 @@
                     <label for="regName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                     <input type="text" id="regName" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
-                
-                <!-- Initial Setup Fields (Only visible to first user) -->
-                <div id="initial-setup-fields" class="hidden space-y-4 pt-4 border-t border-gray-200 mt-4">
-                    <p class="text-sm font-bold text-gray-700">Set Initial Passwords</p>
-                    <div>
-                        <label for="regPassCR" class="block text-sm font-medium text-gray-700 mb-1">CR Dashboard Password</label>
-                        <input type="text" id="regPassCR" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g., BiomedCR">
-                    </div>
-                    <div>
-                        <label for="regPassStudent" class="block text-sm font-medium text-gray-700 mb-1">Student Dashboard Password</label>
-                        <input type="text" id="regPassStudent" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g., BiomedClass">
-                    </div>
+                <div>
+                    <label for="regPass" class="block text-sm font-medium text-gray-700 mb-1">Create Password</label>
+                    <input type="password" id="regPass" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Set your personal password">
                 </div>
-
-                <!-- Standard Student Registration Field (Hidden for first user) -->
-                <div id="standard-student-password-field">
-                    <label for="regPass" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" id="regPass" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter student password">
+                <div class="flex flex-col gap-2 mt-6">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Register & Join</button>
+                    <button type="button" onclick="goBackToClassSelection()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-bold transition-all">Change Class</button>
                 </div>
-
-                <button type="submit" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Register & Join</button>
                 <div class="text-center mt-4 text-sm text-gray-600">
                     Already registered? <a href="#" onclick="toggleAuthMode('login')" class="text-blue-600 font-semibold hover:underline">Login here</a>
                 </div>
@@ -92,23 +149,26 @@
 
     <!-- 2. STUDENT DASHBOARD -->
     <div id="student-dashboard-view" class="hidden w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden flex-col mt-10">
-        <div class="bg-indigo-600 text-white px-6 py-5 flex items-center justify-between shrink-0">
+        <div class="bg-indigo-600 text-white px-6 py-4 flex justify-between items-center shrink-0">
             <div>
                 <h1 class="text-2xl font-bold">Students Dashboard</h1>
-                <p class="text-indigo-100 text-sm mt-1" id="student-welcome-text">Welcome back</p>
+                <p class="text-indigo-100 text-sm mt-1"><span id="student-welcome-text"></span> | <span class="font-mono bg-indigo-800 px-2 py-0.5 rounded ml-1 header-class-display"></span></p>
             </div>
             <div class="flex items-center gap-4">
                 <div class="hidden sm:flex text-sm font-medium bg-indigo-700 px-3 py-1 rounded-full items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse auth-indicator"></span>
                     <span class="auth-text">Connecting...</span>
                 </div>
+                <button onclick="openStudentSettingsModal()" class="p-2 hover:bg-indigo-700 rounded-full transition-colors" title="Settings">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
                 <button onclick="logout()" class="text-indigo-100 hover:text-white font-medium text-sm">Logout</button>
             </div>
         </div>
         
         <div class="p-6 bg-gray-50 flex-grow flex flex-col min-h-[50vh]">
             <!-- Student Home Cards -->
-            <div id="student-home-cards" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto w-full">
+            <div id="student-home-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto w-full">
                 <div onclick="showStudentWorkspace('workspace-announcements-student')" class="bg-white border-2 border-gray-200 rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[220px] cursor-pointer hover:border-indigo-500 hover:shadow-md group">
                     <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
@@ -123,6 +183,13 @@
                     <h3 class="text-xl font-bold text-gray-800">Timetable & Teachers</h3>
                     <p class="text-sm text-gray-500 mt-2 text-center">Weekly schedule & subject details</p>
                 </div>
+                <div onclick="showStudentWorkspace('workspace-attendance-student')" class="bg-white border-2 border-gray-200 rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[220px] cursor-pointer hover:border-blue-500 hover:shadow-md group">
+                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800">My Attendance</h3>
+                    <p class="text-sm text-gray-500 mt-2 text-center">View your personal attendance history</p>
+                </div>
             </div>
 
             <!-- Workspace: Announcements -->
@@ -134,7 +201,7 @@
                     </button>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <h4 class="text-sm font-bold text-gray-700 mb-3 border-b pb-1">Recent (Last 7 Days)</h4>
+                    <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Class Announcements</h4>
                     <div id="student-recent-announcements" class="space-y-4"></div>
                     <button onclick="togglePastAnnouncements('student')" id="btn-student-past-announcements" class="mt-4 text-indigo-600 text-sm font-semibold hidden hover:underline">View Past Announcements</button>
                     <div id="student-past-announcements" class="space-y-4 mt-4 hidden border-t border-gray-200 pt-4"></div>
@@ -160,23 +227,56 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Workspace: Student Attendance -->
+            <div id="workspace-attendance-student" class="hidden flex-col gap-6 max-w-4xl mx-auto w-full">
+                <div class="flex justify-start">
+                    <button onclick="showStudentWorkspace(null)" class="text-gray-700 hover:text-blue-600 flex items-center gap-2 font-bold text-sm bg-white px-4 py-2 rounded-md shadow-sm border border-gray-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Back to Dashboard
+                    </button>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">My Attendance Records</h4>
+                    <div class="overflow-y-auto max-h-[50vh] table-container">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm border-b">
+                                <tr>
+                                    <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b">Date</th>
+                                    <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b">Course / Class</th>
+                                    <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b">Event Topic</th>
+                                    <th class="py-3 px-4 text-sm font-semibold text-gray-600 border-b text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-attendance-list" class="divide-y divide-gray-100">
+                                <tr><td colspan="4" class="py-8 text-center text-gray-400">Loading records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- 3. CR DASHBOARD -->
     <div id="cr-view" class="hidden w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden flex-col">
-        <div class="bg-blue-600 text-white px-6 py-5 flex items-center justify-between shrink-0">
+        <div class="bg-blue-600 text-white px-6 py-4 flex items-center justify-between shrink-0">
             <div>
                 <h1 class="text-2xl font-bold">Class Attendance Manager</h1>
-                <p class="text-blue-100 text-sm mt-1">Class Representative Dashboard</p>
+                <p class="text-blue-100 text-sm mt-1">CR Dashboard | <span class="font-mono bg-blue-800 px-2 py-0.5 rounded ml-1 header-class-display"></span></p>
             </div>
             <div class="flex items-center gap-4">
                 <div class="hidden lg:flex text-sm font-medium bg-blue-700 px-3 py-1 rounded-full items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse auth-indicator"></span>
                     <span class="auth-text">Connecting...</span>
                 </div>
-                <button onclick="openAnnouncementListModal()" class="p-2 hover:bg-blue-700 rounded-full transition-colors" title="Announcements">
+                <button onclick="openAnnouncementListModal()" class="relative p-2 hover:bg-blue-700 rounded-full transition-colors" title="Announcements & Alerts">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    <!-- Notification Badge -->
+                    <span id="cr-notification-badge" class="hidden absolute top-1 right-1 flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    </span>
                 </button>
                 <button onclick="openSettingsModal()" class="p-2 hover:bg-blue-700 rounded-full transition-colors" title="Settings">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -189,7 +289,6 @@
             
             <!-- CR Home Cards -->
             <div id="cr-home-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Take Attendance Card -->
                 <div id="attendance-card" onclick="requestAttendanceAccess()" class="bg-white border-2 border-gray-200 rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[220px] relative hover:border-blue-500 cursor-pointer hover:shadow-md group">
                     <div class="absolute top-4 right-4" id="attendance-card-status">
                         <span class="bg-gray-100 text-gray-500 px-2 py-1 rounded-full text-xs font-bold animate-pulse">Checking status...</span>
@@ -200,7 +299,6 @@
                     <h3 class="text-xl font-bold text-gray-800">Take Attendance</h3>
                     <p class="text-sm text-gray-500 mt-2 text-center">Manage daily roll call and PDFs</p>
                 </div>
-                <!-- Event Checklist Card -->
                 <div onclick="showCRWorkspace('workspace-checklist')" class="bg-white border-2 border-gray-200 rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[220px] relative hover:border-purple-500 cursor-pointer hover:shadow-md group">
                     <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -208,7 +306,6 @@
                     <h3 class="text-xl font-bold text-gray-800">Event Checklist</h3>
                     <p class="text-sm text-gray-500 mt-2 text-center">Track submissions & custom lists</p>
                 </div>
-                <!-- Timetable Card -->
                 <div onclick="showCRWorkspace('workspace-timetable-cr')" class="bg-white border-2 border-gray-200 rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[220px] relative hover:border-teal-500 cursor-pointer hover:shadow-md group">
                     <div class="w-16 h-16 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -283,8 +380,12 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end">
-                    <button onclick="exportToPDF()" id="btn-export" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-md transition-all flex items-center gap-2">
+                <div class="flex flex-col sm:flex-row justify-end items-center gap-4 pt-4 border-t border-gray-200 mt-2">
+                    <button onclick="publishAttendance()" id="btn-publish-attendance" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-bold shadow-md transition-all flex items-center justify-center gap-2">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        Publish to Students
+                    </button>
+                    <button onclick="exportToPDF()" id="btn-export" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-md transition-all flex items-center justify-center gap-2">
                         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" /></svg>
                         Export Attendance PDF
                     </button>
@@ -384,7 +485,7 @@
                 Plain Text Summary
             </h2>
             <button onclick="copyTextSummary()" id="btn-copy-text" class="bg-white text-gray-800 hover:bg-gray-100 px-5 py-2 rounded-md font-bold text-sm transition-colors shadow-sm flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                 Copy Text
             </button>
         </div>
@@ -394,13 +495,13 @@
         </div>
     </div>
 
-    <!-- Announcement List Modal -->
+    <!-- Announcement & Notifications List Modal -->
     <div id="announcement-list-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 px-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all flex flex-col max-h-[85vh]">
             <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center shrink-0">
                 <h3 class="text-lg font-semibold text-white flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                    Class Announcements
+                    Announcements & Alerts
                 </h3>
                 <button onclick="closeAnnouncementListModal()" class="text-indigo-200 hover:text-white transition-colors">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -408,6 +509,15 @@
             </div>
             
             <div class="p-6 overflow-y-auto flex-grow">
+                
+                <div id="cr-password-requests-container" class="hidden mb-6 pb-4 border-b border-gray-200">
+                    <h4 class="text-sm font-bold text-red-600 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Password Reset Requests
+                    </h4>
+                    <div id="cr-password-requests-list" class="space-y-2"></div>
+                </div>
+
                 <h4 class="text-sm font-bold text-gray-700 mb-3 border-b pb-1">Recent (Last 7 Days)</h4>
                 <div id="cr-recent-announcements" class="space-y-4"></div>
                 
@@ -468,16 +578,10 @@
                 </div>
 
                 <div class="pt-4 border-t border-gray-200">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Security / Passwords</h4>
-                    <div class="space-y-3">
-                        <div class="flex gap-2">
-                            <input type="text" id="setting-cr-pass" class="flex-grow px-3 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 text-sm" placeholder="New CR Password">
-                            <button onclick="updateGlobalPasswords('cr')" class="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-md font-bold transition-colors shrink-0 text-sm">Update CRs</button>
-                        </div>
-                        <div class="flex gap-2">
-                            <input type="text" id="setting-student-pass" class="flex-grow px-3 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 text-sm" placeholder="New Student Password">
-                            <button onclick="updateGlobalPasswords('student')" class="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-md font-bold transition-colors shrink-0 text-sm">Update Students</button>
-                        </div>
+                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Change My Password</h4>
+                    <div class="flex flex-col gap-3">
+                        <input type="password" id="setting-cr-pass-personal" class="w-full px-3 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 text-sm" placeholder="New Password">
+                        <button onclick="changeMyPassword('setting-cr-pass-personal')" class="w-full bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-md font-bold transition-colors text-sm">Update Password</button>
                     </div>
                 </div>
                 
@@ -510,7 +614,7 @@
                 <div class="pt-4 border-t border-gray-200">
                     <h4 class="text-sm font-semibold text-red-600 mb-2">Danger Zone</h4>
                     <button onclick="deleteCRDashboard()" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-bold transition-colors">
-                        Delete CR Dashboard (Reset System)
+                        Delete Class Database (Reset)
                     </button>
                     <p class="text-xs text-red-500 mt-1 text-center font-bold">WARNING: Permanently wipes entire database.</p>
                 </div>
@@ -518,7 +622,31 @@
         </div>
     </div>
 
-    <!-- Hidden template for generating PDF styling -->
+    <!-- STUDENT Settings Modal -->
+    <div id="student-settings-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all flex flex-col">
+            <div class="bg-indigo-700 px-6 py-4 flex justify-between items-center shrink-0">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Settings
+                </h3>
+                <button onclick="closeStudentSettingsModal()" class="text-indigo-200 hover:text-white transition-colors">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Change My Password</h4>
+                    <div class="flex flex-col gap-3">
+                        <input type="password" id="setting-student-pass-personal" class="w-full px-3 py-2 border border-gray-300 rounded-md outline-none focus:border-indigo-500 text-sm" placeholder="New Password">
+                        <button onclick="changeMyPassword('setting-student-pass-personal')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-bold transition-colors text-sm">Update Password</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="pdf-container" class="hidden"></div>
 
     <script type="module">
@@ -540,27 +668,16 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         
-        function updateAuthStatus(text, colorClass) {
-            document.querySelectorAll('.auth-text').forEach(el => el.innerText = text);
-            document.querySelectorAll('.auth-indicator').forEach(el => {
-                el.className = `w-2 h-2 rounded-full ${colorClass}`;
-                if(colorClass === 'bg-green-400') el.classList.add('animate-pulse');
-                else el.classList.remove('animate-pulse');
-            });
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) { updateAuthStatus('Cloud Synced', 'bg-green-400'); } 
-            else { updateAuthStatus('Disconnected', 'bg-red-500'); }
-        });
-
-        signInAnonymously(auth); 
-
-        window.systemMeta = { transferUsed: false, globalPassCR: 'BiomedCR', globalPassStudent: 'BiomedClass' };
+        // Globals
+        window.currentClass = null;
+        window.systemMeta = { transferUsed: false };
         window.allAnnouncements = [];
+        window.passwordRequests = [];
+        window.publishedAttendance = [];
         window.isFirstUser = false;
         window.sessionLocked = false;
         window.lockedBy = null;
+        window.loginAttempts = {};
 
         let studentsData = [];
         let attendanceRecord = {}; 
@@ -585,62 +702,115 @@
             }, 3000);
         }
 
-        async function initSystem() {
-            const metaRef = doc(db, 'class_roster', '_system_meta_');
-            const metaSnap = await getDoc(metaRef);
-            if (!metaSnap.exists()) {
-                await setDoc(metaRef, window.systemMeta);
-            } else {
-                window.systemMeta = { ...window.systemMeta, ...metaSnap.data() };
-            }
-
-            const sessionRef = doc(db, 'class_roster', '_system_session_');
-            const sessionSnap = await getDoc(sessionRef);
-            if (!sessionSnap.exists()) {
-                await setDoc(sessionRef, { activeCR: null, crName: null, timestamp: 0 });
-            }
-
-            const snapshot = await getDocs(collection(db, 'class_roster'));
-            let userCount = 0;
-            snapshot.forEach(d => { if (!d.id.startsWith('_system_')) userCount++; });
-
-            if (userCount === 0) {
-                window.isFirstUser = true;
-                toggleAuthMode('register');
-            } else {
-                window.isFirstUser = false;
-            }
+        function updateAuthStatus(text, colorClass) {
+            document.querySelectorAll('.auth-text').forEach(el => el.innerText = text);
+            document.querySelectorAll('.auth-indicator').forEach(el => {
+                el.className = `w-2 h-2 rounded-full ${colorClass}`;
+                if(colorClass === 'bg-green-400') el.classList.add('animate-pulse');
+                else el.classList.remove('animate-pulse');
+            });
         }
-        initSystem();
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) { updateAuthStatus('Cloud Synced', 'bg-green-400'); } 
+            else { updateAuthStatus('Disconnected', 'bg-red-500'); }
+        });
+        signInAnonymously(auth); 
+
+        // ---------- 0. CLASS GATEWAY ---------- //
+        document.getElementById('class-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const classId = document.getElementById('classIdInput').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+            if (!classId) return;
+
+            const btn = e.target.querySelector('button');
+            btn.innerText = 'Checking...';
+
+            try {
+                const metaSnap = await getDoc(doc(db, 'classes', classId, 'meta', 'system'));
+                if (metaSnap.exists()) {
+                    window.currentClass = classId;
+                    window.systemMeta = { ...window.systemMeta, ...metaSnap.data() };
+                    
+                    document.getElementById('class-selection-view').classList.add('hidden');
+                    document.getElementById('auth-view').classList.remove('hidden');
+                    document.getElementById('auth-class-indicator').innerText = `Class: ${classId}`;
+                } else {
+                    window.currentClass = classId; 
+                    document.getElementById('class-selection-view').classList.add('hidden');
+                    document.getElementById('class-setup-view').classList.remove('hidden');
+                    document.getElementById('setup-class-name').innerText = `Class: ${classId}`;
+                }
+            } catch(err) { showToast("Error connecting to database", "error"); }
+            btn.innerText = 'Continue';
+        });
+
+        window.goBackToClassSelection = function() {
+            window.currentClass = null;
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('class-setup-view').classList.add('hidden');
+            document.getElementById('class-selection-view').classList.remove('hidden');
+            
+            document.getElementById('login-form').reset();
+            document.getElementById('register-form').reset();
+            document.getElementById('setup-form').reset();
+            document.getElementById('password-reset-form').reset();
+            
+            document.getElementById('password-reset-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('classIdInput').value = '';
+        }
+
+        // Initialize New Class (Master CR Setup)
+        document.getElementById('setup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const rollNo = document.getElementById('setupRollNo').value.trim();
+            const regNo = document.getElementById('setupRegNo').value.trim();
+            const name = document.getElementById('setupName').value.trim();
+            const crPass = document.getElementById('setupPassCR').value.trim();
+            
+            const btn = e.target.querySelector('button');
+            btn.innerText = 'Creating Class...';
+
+            try {
+                window.systemMeta = { transferUsed: false };
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'system'), window.systemMeta);
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'session'), { activeCR: null, crName: null, timestamp: 0 });
+                await setDoc(doc(db, 'classes', currentClass, 'users', regNo), { rollNo, name, regNo, password: crPass, role: 'cr', createdAt: Date.now() });
+
+                showToast("Class created successfully!");
+                currentUserData = { rollNo, name, regNo, role: 'cr' };
+                document.getElementById('class-setup-view').classList.add('hidden');
+                document.getElementById('cr-view').style.display = 'flex';
+                document.querySelectorAll('.header-class-display').forEach(el => el.innerText = currentClass);
+                
+                listenToAnnouncements();
+                listenToTimetable();
+                loadClassRoster();
+                listenToSession(); 
+                loadChecklistDraft(); 
+                listenToAttendanceHistory();
+                listenToPasswordRequests();
+            } catch(err) {
+                showToast("Failed to create class", "error");
+                window.currentClass = null;
+            }
+            btn.innerText = 'Create Class & Login';
+        });
 
         window.toggleAuthMode = function(mode) {
             const loginForm = document.getElementById('login-form');
             const regForm = document.getElementById('register-form');
             const title = document.getElementById('auth-title');
             const subtitle = document.getElementById('auth-subtitle');
-            
-            const initFields = document.getElementById('initial-setup-fields');
-            const standardField = document.getElementById('standard-student-password-field');
+
+            document.getElementById('password-reset-form').classList.add('hidden');
 
             if (mode === 'register') {
                 loginForm.classList.add('hidden');
                 regForm.classList.remove('hidden');
-                
-                if (window.isFirstUser) {
-                    title.innerText = 'Database Setup';
-                    subtitle.innerText = 'Register the Master CR to initialize';
-                    initFields.classList.remove('hidden');
-                    standardField.classList.add('hidden');
-                } else {
-                    title.innerText = 'Join the Class';
-                    subtitle.innerText = 'Register to access the roster';
-                    initFields.classList.add('hidden');
-                    standardField.classList.remove('hidden');
-                    const passInput = document.getElementById('regPass');
-                    const passText = document.getElementById('regPassText');
-                    if(passInput) passInput.value = window.systemMeta.globalPassStudent;
-                    if(passText) passText.innerText = `Default student password is '${window.systemMeta.globalPassStudent}'`;
-                }
+                title.innerText = 'Join the Class';
+                subtitle.innerText = 'Register to access the roster';
             } else {
                 regForm.classList.add('hidden');
                 loginForm.classList.remove('hidden');
@@ -649,11 +819,19 @@
             }
         }
 
+        window.cancelResetMode = function() {
+            window.resetTargetRegNo = null;
+            document.getElementById('password-reset-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('auth-title').innerText = 'Welcome Back';
+            document.getElementById('auth-subtitle').innerText = 'Login to access your dashboard';
+        }
+
         window.logout = async function() {
-            if (currentUserData && currentUserData.role === 'cr') {
+            if (currentUserData && currentUserData.role === 'cr' && currentClass) {
                 const workspace = document.getElementById('attendance-workspace');
                 if (workspace && !workspace.classList.contains('hidden')) {
-                    await setDoc(doc(db, 'class_roster', '_system_session_'), { activeCR: null, crName: null, timestamp: Date.now() }, { merge: true });
+                    await setDoc(doc(db, 'classes', currentClass, 'meta', 'session'), { activeCR: null, crName: null, timestamp: Date.now() }, { merge: true });
                 }
             }
             
@@ -665,13 +843,8 @@
             showCRWorkspace(null);
             showStudentWorkspace(null);
             
-            const authView = document.getElementById('auth-view');
-            authView.style.display = 'block';
-            
-            document.getElementById('login-form').reset();
-            document.getElementById('register-form').reset();
+            goBackToClassSelection();
             showToast("Logged out successfully");
-            initSystem(); 
         }
 
         // ---------- WORKSPACE NAVIGATION ---------- //
@@ -696,7 +869,7 @@
             document.getElementById('student-home-cards').classList.add('hidden');
             document.getElementById('text-summary-section').classList.add('hidden');
             
-            ['workspace-announcements-student', 'workspace-timetable-student'].forEach(id => {
+            ['workspace-announcements-student', 'workspace-timetable-student', 'workspace-attendance-student'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
                 document.getElementById(id).classList.remove('flex');
             });
@@ -709,9 +882,10 @@
             }
         };
 
-        // ---------- CONCURRENCY CONTROL (LOCKING) ---------- //
+        // ---------- CONCURRENCY CONTROL ---------- //
         function listenToSession() {
-            onSnapshot(doc(db, 'class_roster', '_system_session_'), (docSnap) => {
+            if(!currentClass) return;
+            onSnapshot(doc(db, 'classes', currentClass, 'meta', 'session'), (docSnap) => {
                 if (docSnap.exists() && currentUserData && currentUserData.role === 'cr') {
                     const data = docSnap.data();
                     const now = Date.now();
@@ -744,21 +918,103 @@
         window.requestAttendanceAccess = async function() {
             if (window.sessionLocked) { showToast(`Function currently in use by ${window.lockedBy}`, 'warning'); return; }
             try {
-                await setDoc(doc(db, 'class_roster', '_system_session_'), { activeCR: currentUserData.regNo, crName: currentUserData.name, timestamp: Date.now() }, { merge: true });
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'session'), { activeCR: currentUserData.regNo, crName: currentUserData.name, timestamp: Date.now() }, { merge: true });
                 showCRWorkspace('attendance-workspace');
             } catch(e) { showToast("Error checking session", "error"); }
         };
 
         window.releaseAttendanceAccess = async function() {
             try {
-                await setDoc(doc(db, 'class_roster', '_system_session_'), { activeCR: null, crName: null, timestamp: Date.now() }, { merge: true });
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'session'), { activeCR: null, crName: null, timestamp: Date.now() }, { merge: true });
                 showCRWorkspace(null);
             } catch (err) { showToast("Error closing session", "error"); }
         };
 
+        // ---------- ATTENDANCE PUBLISHING & TRACKING ---------- //
+        function listenToAttendanceHistory() {
+            if(!currentClass) return;
+            onSnapshot(doc(db, 'classes', currentClass, 'meta', 'attendance_history'), (docSnap) => {
+                if (docSnap.exists()) {
+                    window.publishedAttendance = docSnap.data().list || [];
+                } else {
+                    window.publishedAttendance = [];
+                }
+                if (currentUserData && currentUserData.role === 'student') {
+                    renderStudentPersonalAttendance();
+                }
+            });
+        }
+
+        window.publishAttendance = async function() {
+            if (studentsData.length === 0) { showToast("No students to publish.", "warning"); return; }
+            const courseName = document.getElementById('courseName').value.trim() || 'General';
+            const className = document.getElementById('className').value.trim() || 'Class';
+            const eventName = document.getElementById('eventTopic').value.trim() || '-';
+            const dateVal = document.getElementById('classDate').value;
+            const formattedDate = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+            if(!confirm(`Publish this attendance record to all students?\nDate: ${formattedDate}\nEvent: ${eventName}`)) return;
+
+            const btn = document.getElementById('btn-publish-attendance');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = 'Publishing...'; btn.disabled = true;
+
+            try {
+                const currentRecordMap = {};
+                studentsData.forEach(s => { currentRecordMap[s.id] = attendanceRecord[s.id] || 'Absent'; });
+
+                const newRecord = {
+                    id: Date.now().toString(),
+                    timestamp: Date.now(),
+                    date: formattedDate,
+                    courseName, className, eventName,
+                    records: currentRecordMap
+                };
+
+                const updatedList = [newRecord, ...window.publishedAttendance].slice(0, 50); 
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'attendance_history'), { list: updatedList }, { merge: true });
+                
+                showToast("Attendance published successfully!");
+            } catch(e) { showToast("Failed to publish attendance", "error"); }
+            
+            btn.innerHTML = originalHTML; btn.disabled = false;
+        };
+
+        function renderStudentPersonalAttendance() {
+            const listEl = document.getElementById('student-attendance-list');
+            if(!listEl) return;
+
+            if (window.publishedAttendance.length === 0) {
+                listEl.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-gray-500 bg-white">No attendance records published yet.</td></tr>`;
+                return;
+            }
+
+            listEl.innerHTML = '';
+            window.publishedAttendance.forEach(record => {
+                const myStatus = record.records[currentUserData.regNo] || 'Not Recorded'; 
+                let statusBadge = '';
+                if (myStatus === 'Present') statusBadge = '<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">Present</span>';
+                else if (myStatus === 'Absent') statusBadge = '<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-bold">Absent</span>';
+                else statusBadge = '<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-bold">N/A</span>';
+
+                listEl.innerHTML += `
+                    <tr class="hover:bg-gray-50 bg-white border-b border-gray-100">
+                        <td class="py-3 px-4 text-gray-800 text-sm whitespace-nowrap">${escapeHtml(record.date)}</td>
+                        <td class="py-3 px-4 text-gray-600 text-sm">
+                            <div class="font-bold text-gray-800">${escapeHtml(record.className)}</div>
+                            <div class="text-xs">${escapeHtml(record.courseName)}</div>
+                        </td>
+                        <td class="py-3 px-4 text-gray-600 text-sm font-medium">${escapeHtml(record.eventName)}</td>
+                        <td class="py-3 px-4 text-center">${statusBadge}</td>
+                    </tr>
+                `;
+            });
+        }
+
         // ---------- TIMETABLE LOGIC ---------- //
         function listenToTimetable() {
-            onSnapshot(doc(db, 'class_roster', '_system_timetable_'), (docSnap) => {
+            if(!currentClass) return;
+            onSnapshot(doc(db, 'classes', currentClass, 'meta', 'timetable'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     const tt = data.timetable || '';
@@ -783,7 +1039,7 @@
             const tt = document.getElementById('cr-timetable-text').value;
             const th = document.getElementById('cr-teachers-text').value;
             try {
-                await setDoc(doc(db, 'class_roster', '_system_timetable_'), { timetable: tt, teachers: th }, {merge: true});
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'timetable'), { timetable: tt, teachers: th }, {merge: true});
                 showToast("Timetable synced to database!");
             } catch(e) { showToast("Failed to save timetable", "error"); }
             btn.innerText = "Save & Sync to Students";
@@ -792,15 +1048,16 @@
         window.clearTimetable = async function() {
             if(!confirm("Clear timetable and teachers for all students? This removes it from the database.")) return;
             try {
-                await setDoc(doc(db, 'class_roster', '_system_timetable_'), { timetable: '', teachers: '' });
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'timetable'), { timetable: '', teachers: '' });
                 showToast("Timetable cleared from database.");
             } catch(e) { showToast("Error clearing timetable", "error"); }
         };
 
         // ---------- CHECKLIST LOGIC ---------- //
         async function loadChecklistDraft() {
+            if(!currentClass) return;
             try {
-                const snap = await getDoc(doc(db, 'class_roster', '_system_checklist_'));
+                const snap = await getDoc(doc(db, 'classes', currentClass, 'meta', 'checklist'));
                 if(snap.exists()) {
                     const data = snap.data();
                     document.getElementById('checklistFor').value = data.eventName || '';
@@ -822,7 +1079,7 @@
             for (let id in checklistRecord) { if (checklistRecord[id]) checksToSave[id] = true; }
 
             try {
-                await setDoc(doc(db, 'class_roster', '_system_checklist_'), { eventName: eventName, eventDate: eventDate, checks: checksToSave });
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'checklist'), { eventName: eventName, eventDate: eventDate, checks: checksToSave });
                 showToast("Checklist draft saved to database!");
             } catch(e) { showToast("Failed to save draft", "error"); }
             btn.innerText = 'Save Draft';
@@ -831,7 +1088,7 @@
         window.clearChecklistDraft = async function() {
             if(!confirm("Are you sure you want to clear this draft from the database?")) return;
             try {
-                await setDoc(doc(db, 'class_roster', '_system_checklist_'), { eventName: '', eventDate: '', checks: {} });
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'checklist'), { eventName: '', eventDate: '', checks: {} });
                 document.getElementById('checklistFor').value = '';
                 document.getElementById('checklistDate').valueAsDate = new Date();
                 checklistRecord = {};
@@ -842,11 +1099,11 @@
 
         // ---------- ANNOUNCEMENT LOGIC ---------- //
         function listenToAnnouncements() {
-            onSnapshot(doc(db, 'class_roster', '_system_announcement_'), (docSnap) => {
+            if(!currentClass) return;
+            onSnapshot(doc(db, 'classes', currentClass, 'meta', 'announcements'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     let list = data.list || [];
-                    if (data.text && list.length === 0) list.push({ id: data.timestamp.toString(), text: data.text, timestamp: data.timestamp });
                     window.allAnnouncements = list.sort((a,b) => b.timestamp - a.timestamp);
                 } else { window.allAnnouncements = []; }
                 renderAnnouncementsUI();
@@ -923,7 +1180,7 @@
             try {
                 const newAnn = { id: Date.now().toString(), text, timestamp: Date.now() };
                 const updatedList = [newAnn, ...window.allAnnouncements];
-                await setDoc(doc(db, 'class_roster', '_system_announcement_'), { list: updatedList, text: "" }, { merge: true });
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'announcements'), { list: updatedList }, { merge: true });
                 showToast("Announcement published!");
                 document.getElementById('announcement-input').value = '';
                 closeAnnouncementDraftModal();
@@ -935,51 +1192,140 @@
             if(!confirm("Delete this announcement? It will be permanently removed from the database.")) return;
             try {
                 const updatedList = window.allAnnouncements.filter(a => a.id !== id);
-                await setDoc(doc(db, 'class_roster', '_system_announcement_'), { list: updatedList, text: "" }, { merge: true });
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'announcements'), { list: updatedList }, { merge: true });
                 showToast("Announcement permanently deleted");
             } catch(e) { showToast("Failed to delete", "error"); }
         };
-        // ---------------------------------------- //
 
+        // ---------- PASSWORD REQUEST LOGIC ---------- //
+        function listenToPasswordRequests() {
+            if(!currentClass || !currentUserData || currentUserData.role !== 'cr') return;
+            onSnapshot(collection(db, 'classes', currentClass, 'password_requests'), (snapshot) => {
+                window.passwordRequests = [];
+                snapshot.forEach(d => {
+                    window.passwordRequests.push({ id: d.id, ...d.data() });
+                });
+                renderPasswordRequestsUI();
+            });
+        }
+
+        function renderPasswordRequestsUI() {
+            const container = document.getElementById('cr-password-requests-container');
+            const listEl = document.getElementById('cr-password-requests-list');
+            const badge = document.getElementById('cr-notification-badge');
+            
+            if(!container || !listEl || !badge) return;
+
+            if (window.passwordRequests.length > 0) {
+                container.classList.remove('hidden');
+                badge.classList.remove('hidden');
+                listEl.innerHTML = window.passwordRequests.map(r => `
+                    <div class="bg-red-50 border border-red-200 p-3 rounded-md flex justify-between items-center gap-4">
+                        <div>
+                            <p class="text-sm font-bold text-gray-800">${escapeHtml(r.name)} <span class="text-xs text-gray-500 font-normal">(${r.role === 'cr' ? 'CR' : 'Student'})</span></p>
+                            <p class="text-xs text-gray-600">Reg: ${escapeHtml(r.regNo)} | Roll: ${escapeHtml(r.rollNo)}</p>
+                        </div>
+                        <button onclick="approvePasswordReset('${r.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors shrink-0 shadow-sm">
+                            Approve
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                container.classList.add('hidden');
+                badge.classList.add('hidden');
+                listEl.innerHTML = '';
+            }
+        }
+
+        window.approvePasswordReset = async function(regNo) {
+            try {
+                await updateDoc(doc(db, 'classes', currentClass, 'users', regNo), { resetApproved: true });
+                await deleteDoc(doc(db, 'classes', currentClass, 'password_requests', regNo));
+                showToast(`Approved reset for ${regNo}`);
+            } catch(e) { showToast("Failed to approve reset", "error"); }
+        };
+
+        // ---------- LOGIN / REGISTER ---------- //
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const regNo = document.getElementById('loginRegNo').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
-            const btn = e.target.querySelector('button');
+            
+            const attempts = window.loginAttempts[regNo] || 0;
+            if (attempts >= 3) {
+                showToast("Account locked. Please request a password reset via the Registration tab.", "error");
+                return;
+            }
+
+            const btn = document.getElementById('btn-login-submit');
             btn.innerText = 'Verifying...';
 
             try {
-                const docRef = doc(db, 'class_roster', regNo);
-                const docSnap = await getDoc(docRef);
+                const docSnap = await getDoc(doc(db, 'classes', currentClass, 'users', regNo));
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
+                    
+                    if (data.resetApproved) {
+                        window.resetTargetRegNo = regNo;
+                        document.getElementById('login-form').classList.add('hidden');
+                        document.getElementById('password-reset-form').classList.remove('hidden');
+                        document.getElementById('auth-title').innerText = 'Set New Password';
+                        document.getElementById('auth-subtitle').innerText = 'Enter your new credentials';
+                        btn.innerText = 'Login';
+                        return;
+                    }
+
                     if (data.password === pass) {
+                        window.loginAttempts[regNo] = 0; 
                         currentUserData = data;
                         document.getElementById('auth-view').style.display = 'none';
+                        document.querySelectorAll('.header-class-display').forEach(el => el.innerText = currentClass);
+                        
                         listenToAnnouncements();
                         listenToTimetable();
+                        listenToAttendanceHistory();
 
                         if (data.role === 'cr') {
                             document.getElementById('cr-view').style.display = 'flex';
                             loadClassRoster();
                             listenToSession(); 
                             loadChecklistDraft(); 
+                            listenToPasswordRequests();
                         } else {
                             document.getElementById('student-dashboard-view').style.display = 'flex';
                             document.getElementById('student-welcome-text').innerText = 'Welcome back, ' + data.name;
                         }
                         showToast(`Welcome, ${data.name}!`);
                     } else {
-                        showToast('Incorrect password', 'error');
+                        window.loginAttempts[regNo] = attempts + 1;
+                        showToast(`Incorrect password. Attempt ${window.loginAttempts[regNo]} of 3`, 'error');
                     }
-                } else {
-                    showToast('Registration No not found. Please register.', 'error');
-                }
-            } catch (err) {
-                showToast("Connection error", "error");
-            }
+                } else { showToast('Registration No not found in this class.', 'error'); }
+            } catch (err) { showToast("Connection error", "error"); }
             btn.innerText = 'Login';
+        });
+
+        document.getElementById('password-reset-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPass = document.getElementById('newResetPass').value.trim();
+            const btn = e.target.querySelector('button');
+            btn.innerText = 'Saving...';
+
+            try {
+                await updateDoc(doc(db, 'classes', currentClass, 'users', window.resetTargetRegNo), { 
+                    password: newPass, 
+                    resetApproved: deleteDoc 
+                });
+                showToast("Password updated successfully. Please login.");
+                
+                document.getElementById('loginPass').value = newPass;
+                cancelResetMode();
+                document.getElementById('btn-login-submit').click();
+            } catch(e) {
+                showToast("Failed to set new password", "error");
+            }
+            btn.innerText = 'Save Password & Login';
         });
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
@@ -987,62 +1333,41 @@
             const rollNo = document.getElementById('regRollNo').value.trim();
             const name = document.getElementById('regName').value.trim();
             const regNo = document.getElementById('regRegNo').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
             const btn = e.target.querySelector('button');
-            btn.innerText = 'Saving...';
 
             try {
-                const docRef = doc(db, 'class_roster', regNo);
+                const docRef = doc(db, 'classes', currentClass, 'users', regNo);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
-                    showToast('Registration No already exists. Please login.', 'warning');
+                    if (confirm('An account with this Registration No already exists. Do you want to request a password reset from the CR?')) {
+                        await setDoc(doc(db, 'classes', currentClass, 'password_requests', regNo), {
+                            regNo: regNo,
+                            name: docSnap.data().name,
+                            rollNo: docSnap.data().rollNo,
+                            role: docSnap.data().role,
+                            timestamp: Date.now()
+                        });
+                        showToast("Password reset request sent to CR. Check back later to login.", "success");
+                        toggleAuthMode('login');
+                    }
                 } else {
-                    const snapshot = await getDocs(collection(db, 'class_roster'));
-                    let uCount = 0;
-                    snapshot.forEach(d => { if (!d.id.startsWith('_system_')) uCount++; });
-
-                    let role = 'student';
-                    let finalPass = '';
-                    
-                    if (uCount === 0) {
-                        role = 'cr';
-                        const crPassInput = document.getElementById('regPassCR').value.trim();
-                        const stPassInput = document.getElementById('regPassStudent').value.trim();
-                        finalPass = crPassInput || 'BiomedCR';
-                        window.systemMeta.globalPassCR = finalPass;
-                        window.systemMeta.globalPassStudent = stPassInput || 'BiomedClass';
-                        await setDoc(doc(db, 'class_roster', '_system_meta_'), window.systemMeta, { merge: true });
-                    } else {
-                        finalPass = document.getElementById('regPass').value.trim() || window.systemMeta.globalPassStudent;
-                    }
-
-                    await setDoc(docRef, { rollNo, name, regNo, password: finalPass, role: role, createdAt: Date.now() });
-                    
-                    if (role === 'cr') {
-                        showToast('Master CR registered & DB initialized!');
-                        window.isFirstUser = false;
-                    } else {
-                        showToast('Registration successful! You can now login.');
-                    }
-                    
+                    btn.innerText = 'Saving...';
+                    await setDoc(docRef, { rollNo, name, regNo, password: pass, role: 'student', createdAt: Date.now() });
+                    showToast('Registration successful! You can now login.');
                     toggleAuthMode('login');
                     document.getElementById('loginRegNo').value = regNo;
+                    btn.innerText = 'Register & Join';
                 }
-            } catch (err) {
-                showToast("Registration failed", "error");
-            }
-            btn.innerText = 'Register & Join';
+            } catch (err) { showToast("Registration failed", "error"); btn.innerText = 'Register & Join'; }
         });
 
         function loadClassRoster() {
-            const rosterRef = collection(db, 'class_roster');
-            onSnapshot(rosterRef, (snapshot) => {
+            if(!currentClass) return;
+            onSnapshot(collection(db, 'classes', currentClass, 'users'), (snapshot) => {
                 studentsData = [];
                 snapshot.forEach((doc) => {
-                    if (doc.id.startsWith('_system_')) {
-                        if(doc.id === '_system_meta_') window.systemMeta = doc.data();
-                        return;
-                    }
                     const data = doc.data();
                     studentsData.push({ id: doc.id, ...data });
                     if (attendanceRecord[doc.id] === undefined) attendanceRecord[doc.id] = 'Present';
@@ -1069,7 +1394,7 @@
             if (student && student.role === 'cr') { showToast("Cannot delete a CR account from the roster view.", "error"); return; }
             if(!confirm("Remove this student from the class roster?")) return;
             try {
-                await deleteDoc(doc(db, 'class_roster', studentId));
+                await deleteDoc(doc(db, 'classes', currentClass, 'users', studentId));
                 delete attendanceRecord[studentId]; 
                 delete checklistRecord[studentId];
                 showToast("Student removed");
@@ -1135,7 +1460,6 @@
         window.openSettingsModal = function() {
             const promoteSelect = document.getElementById('cr-promote-select');
             const promoteBtn = document.getElementById('btn-promote-cr');
-            const limitMsg = document.getElementById('cr-limit-msg');
             
             const transferSelect = document.getElementById('cr-transfer-select');
             const transferBtn = document.getElementById('btn-transfer-cr');
@@ -1148,13 +1472,13 @@
             if (crCount >= 2) {
                 promoteSelect.disabled = true; promoteBtn.disabled = true;
                 promoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                limitMsg.innerText = "Limit Reached: Maximum 2 CRs allowed.";
-                limitMsg.classList.add('text-red-500');
+                document.getElementById('cr-limit-msg').innerText = "Limit Reached: Maximum 2 CRs allowed.";
+                document.getElementById('cr-limit-msg').classList.add('text-red-500');
             } else {
                 promoteSelect.disabled = false; promoteBtn.disabled = false;
                 promoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                limitMsg.innerText = `Their password will change to '${window.systemMeta.globalPassCR}'`;
-                limitMsg.classList.remove('text-red-500');
+                document.getElementById('cr-limit-msg').innerText = "They will keep their current password.";
+                document.getElementById('cr-limit-msg').classList.remove('text-red-500');
             }
 
             if (window.systemMeta && window.systemMeta.transferUsed) {
@@ -1184,35 +1508,28 @@
 
         window.closeSettingsModal = function() { document.getElementById('settings-modal').classList.add('hidden'); };
 
-        window.updateGlobalPasswords = async function(roleType) {
-            const isCR = roleType === 'cr';
-            const inputId = isCR ? 'setting-cr-pass' : 'setting-student-pass';
+        window.openStudentSettingsModal = function() { document.getElementById('student-settings-modal').classList.remove('hidden'); };
+        window.closeStudentSettingsModal = function() { document.getElementById('student-settings-modal').classList.add('hidden'); };
+
+        window.changeMyPassword = async function(inputId) {
             const newPass = document.getElementById(inputId).value.trim();
-            
             if(!newPass) { showToast("Password cannot be empty", "warning"); return; }
-            if(!confirm(`Are you sure you want to change the password for ALL ${isCR ? 'CRs' : 'Students'} to: ${newPass} ?`)) return;
+            if(!confirm(`Are you sure you want to change your password?`)) return;
 
             try {
-                if(isCR) window.systemMeta.globalPassCR = newPass;
-                else window.systemMeta.globalPassStudent = newPass;
-                await setDoc(doc(db, 'class_roster', '_system_meta_'), window.systemMeta, { merge: true });
-
-                const q = query(collection(db, 'class_roster'), where('role', '==', isCR ? 'cr' : 'student'));
-                const querySnapshot = await getDocs(q);
-                const updatePromises = [];
-                querySnapshot.forEach((d) => { updatePromises.push(updateDoc(doc(db, 'class_roster', d.id), { password: newPass })); });
-                await Promise.all(updatePromises);
-
+                await updateDoc(doc(db, 'classes', currentClass, 'users', currentUserData.regNo), { password: newPass });
                 document.getElementById(inputId).value = '';
-                showToast(`Global ${isCR ? 'CR' : 'Student'} password updated successfully!`);
-            } catch(e) { showToast("Failed to update passwords", "error"); }
+                showToast(`Your password has been updated successfully!`);
+                closeSettingsModal();
+                closeStudentSettingsModal();
+            } catch(e) { showToast("Failed to update password", "error"); }
         };
 
         window.promoteToCR = async function() {
             const select = document.getElementById('cr-promote-select');
             if (!select.value) return;
             try {
-                await updateDoc(doc(db, 'class_roster', select.value), { role: 'cr', password: window.systemMeta.globalPassCR });
+                await updateDoc(doc(db, 'classes', currentClass, 'users', select.value), { role: 'cr' });
                 showToast("Student successfully promoted to CR!");
                 closeSettingsModal();
             } catch (err) { showToast("Failed to promote student", "error"); }
@@ -1224,9 +1541,9 @@
             if(window.systemMeta.transferUsed) { showToast("Transfer feature used once.", "error"); return; }
             if(!confirm("Are you sure? You will permanently transfer your CR role and become a student.")) return;
             try {
-                await setDoc(doc(db, 'class_roster', '_system_meta_'), { transferUsed: true }, { merge: true });
-                await updateDoc(doc(db, 'class_roster', select.value), { role: 'cr', password: window.systemMeta.globalPassCR });
-                await updateDoc(doc(db, 'class_roster', currentUserData.regNo), { role: 'student', password: window.systemMeta.globalPassStudent });
+                await setDoc(doc(db, 'classes', currentClass, 'meta', 'system'), { transferUsed: true }, { merge: true });
+                await updateDoc(doc(db, 'classes', currentClass, 'users', select.value), { role: 'cr' });
+                await updateDoc(doc(db, 'classes', currentClass, 'users', currentUserData.regNo), { role: 'student' });
                 showToast("Role transferred successfully! Logging out...");
                 closeSettingsModal();
                 setTimeout(() => logout(), 1500); 
@@ -1236,10 +1553,10 @@
         window.deleteAllStudents = async function() {
             if(!confirm("WARNING: This will delete ALL non-CR students from the database. Are you sure?")) return;
             try {
-                const q = query(collection(db, 'class_roster'), where('role', '==', 'student'));
+                const q = query(collection(db, 'classes', currentClass, 'users'), where('role', '==', 'student'));
                 const querySnapshot = await getDocs(q);
                 const deletePromises = [];
-                querySnapshot.forEach((d) => { deletePromises.push(deleteDoc(doc(db, 'class_roster', d.id))); });
+                querySnapshot.forEach((d) => { deletePromises.push(deleteDoc(doc(db, 'classes', currentClass, 'users', d.id))); });
                 await Promise.all(deletePromises);
                 showToast("All student entries deleted.");
                 closeSettingsModal();
@@ -1247,13 +1564,23 @@
         };
 
         window.deleteCRDashboard = async function() {
-            if(!confirm("CRITICAL WARNING: This will permanently wipe the entire class roster. You will be logged out. Are you sure?")) return;
+            if(!confirm("CRITICAL WARNING: This will permanently wipe the entire class database. You will be logged out. Are you sure?")) return;
             try {
-                const querySnapshot = await getDocs(collection(db, 'class_roster'));
+                // Delete Meta
+                ['system', 'session', 'announcements', 'timetable', 'checklist', 'attendance_history'].forEach(async (metaDoc) => {
+                    await deleteDoc(doc(db, 'classes', currentClass, 'meta', metaDoc));
+                });
+                
+                // Delete Users
+                const querySnapshot = await getDocs(collection(db, 'classes', currentClass, 'users'));
                 const deletePromises = [];
-                querySnapshot.forEach((d) => { deletePromises.push(deleteDoc(doc(db, 'class_roster', d.id))); });
+                querySnapshot.forEach((d) => { deletePromises.push(deleteDoc(doc(db, 'classes', currentClass, 'users', d.id))); });
+                const prSnapshot = await getDocs(collection(db, 'classes', currentClass, 'password_requests'));
+                prSnapshot.forEach((d) => { deletePromises.push(deleteDoc(doc(db, 'classes', currentClass, 'password_requests', d.id))); });
+                
                 await Promise.all(deletePromises);
-                showToast("Dashboard completely deleted.");
+                
+                showToast("Class Database completely deleted.");
                 closeSettingsModal();
                 logout();
             } catch (err) { showToast("Error deleting dashboard", "error"); }
@@ -1267,7 +1594,7 @@
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            showToast("Students Dashboard link copied!");
+            showToast("App link copied!");
         };
 
         function escapeHtml(unsafe) { return String(unsafe).replace(/[&<"'>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c])); }
