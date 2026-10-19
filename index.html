@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+import base64
+
+html_code = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -25,65 +27,11 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- 0. CLASS SELECTION VIEW (Gateway) -->
-    <div id="class-selection-view" class="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200 transition-all">
-        <div class="bg-blue-800 text-white px-6 py-5 text-center relative">
-            <h1 class="text-2xl font-bold">Class Portal</h1>
-            <p class="text-blue-200 text-sm mt-1">Enter your Class Code to begin</p>
-        </div>
-        <div class="p-6">
-            <form id="class-form" class="space-y-4">
-                <div>
-                    <label for="classIdInput" class="block text-sm font-medium text-gray-700 mb-1">Class Code</label>
-                    <input type="text" id="classIdInput" required placeholder="e.g., CS101, BIOMED-A" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-colors uppercase">
-                </div>
-                <button type="submit" class="w-full mt-6 bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-bold shadow-md transition-all">Continue</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 0.5 CLASS SETUP VIEW (For New Classes) -->
-    <div id="class-setup-view" class="hidden w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200 transition-all">
-        <div class="bg-indigo-700 text-white px-6 py-5 text-center relative">
-            <h1 class="text-2xl font-bold">Initialize New Class</h1>
-            <p class="text-indigo-200 text-sm mt-1 font-mono" id="setup-class-name"></p>
-        </div>
-        <div class="p-6">
-            <p class="text-sm text-gray-600 mb-4 text-center">This class does not exist yet. Register to create it and become the Master CR.</p>
-            <form id="setup-form" class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="setupRollNo" class="block text-sm font-medium text-gray-700 mb-1">Your Roll No</label>
-                        <input type="text" id="setupRollNo" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                    <div>
-                        <label for="setupRegNo" class="block text-sm font-medium text-gray-700 mb-1">Your Reg No</label>
-                        <input type="text" id="setupRegNo" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                </div>
-                <div>
-                    <label for="setupName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input type="text" id="setupName" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div class="space-y-4 pt-4 border-t border-gray-200 mt-4">
-                    <div>
-                        <label for="setupPassCR" class="block text-sm font-medium text-gray-700 mb-1">Create Your Password</label>
-                        <input type="password" id="setupPassCR" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Enter secure password">
-                    </div>
-                </div>
-                <div class="flex flex-col gap-2 mt-6">
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Create Class & Login</button>
-                    <button type="button" onclick="goBackToClassSelection()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-bold transition-all">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 1. AUTHENTICATION VIEW (For Existing Classes) -->
-    <div id="auth-view" class="hidden w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200 transition-all">
+    <!-- 1. AUTHENTICATION VIEW (Direct Login Gateway) -->
+    <div id="auth-view" class="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200 transition-all">
         <div class="bg-blue-600 text-white px-6 py-4 text-center relative">
-            <h1 class="text-2xl font-bold" id="auth-title">Welcome Back</h1>
-            <p class="text-blue-100 text-sm mt-1 font-mono" id="auth-class-indicator"></p>
+            <h1 class="text-2xl font-bold" id="auth-title">Dashboard By CR</h1>
+            <p class="text-blue-100 text-sm mt-1 font-mono" id="auth-class-indicator">Login to access your dashboard</p>
         </div>
         <div class="p-6">
             <!-- Login Form -->
@@ -98,7 +46,6 @@
                 </div>
                 <div class="flex flex-col gap-2 mt-6">
                     <button type="submit" id="btn-login-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Login</button>
-                    <button type="button" onclick="goBackToClassSelection()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-bold transition-all">Change Class</button>
                 </div>
                 <div class="text-center mt-4 text-sm text-gray-600">
                     New student or Forgot Password? <a href="#" onclick="toggleAuthMode('register')" class="text-blue-600 font-semibold hover:underline">Register/Reset here</a>
@@ -118,6 +65,10 @@
 
             <!-- Register Form -->
             <form id="register-form" class="space-y-4 hidden">
+                <div>
+                    <label for="regClassCode" class="block text-sm font-medium text-gray-700 mb-1">Class Code</label>
+                    <input type="text" id="regClassCode" required placeholder="e.g., CS101, BIOMED-A" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-colors uppercase">
+                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="regRollNo" class="block text-sm font-medium text-gray-700 mb-1">Roll No</label>
@@ -138,7 +89,7 @@
                 </div>
                 <div class="flex flex-col gap-2 mt-6">
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Register & Join</button>
-                    <button type="button" onclick="goBackToClassSelection()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-bold transition-all">Change Class</button>
+                    <button type="button" onclick="toggleAuthMode('login')" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-bold transition-all">Cancel</button>
                 </div>
                 <div class="text-center mt-4 text-sm text-gray-600">
                     Already registered? <a href="#" onclick="toggleAuthMode('login')" class="text-blue-600 font-semibold hover:underline">Login here</a>
@@ -717,104 +668,24 @@
         });
         signInAnonymously(auth); 
 
-        // ---------- 0. CLASS GATEWAY ---------- //
-        document.getElementById('class-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const classId = document.getElementById('classIdInput').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
-            if (!classId) return;
-
-            const btn = e.target.querySelector('button');
-            btn.innerText = 'Checking...';
-
-            try {
-                const metaSnap = await getDoc(doc(db, 'classes', classId, 'meta', 'system'));
-                if (metaSnap.exists()) {
-                    window.currentClass = classId;
-                    window.systemMeta = { ...window.systemMeta, ...metaSnap.data() };
-                    
-                    document.getElementById('class-selection-view').classList.add('hidden');
-                    document.getElementById('auth-view').classList.remove('hidden');
-                    document.getElementById('auth-class-indicator').innerText = `Class: ${classId}`;
-                } else {
-                    window.currentClass = classId; 
-                    document.getElementById('class-selection-view').classList.add('hidden');
-                    document.getElementById('class-setup-view').classList.remove('hidden');
-                    document.getElementById('setup-class-name').innerText = `Class: ${classId}`;
-                }
-            } catch(err) { showToast("Error connecting to database", "error"); }
-            btn.innerText = 'Continue';
-        });
-
-        window.goBackToClassSelection = function() {
-            window.currentClass = null;
-            document.getElementById('auth-view').classList.add('hidden');
-            document.getElementById('class-setup-view').classList.add('hidden');
-            document.getElementById('class-selection-view').classList.remove('hidden');
-            
-            document.getElementById('login-form').reset();
-            document.getElementById('register-form').reset();
-            document.getElementById('setup-form').reset();
-            document.getElementById('password-reset-form').reset();
-            
-            document.getElementById('password-reset-form').classList.add('hidden');
-            document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('classIdInput').value = '';
-        }
-
-        // Initialize New Class (Master CR Setup)
-        document.getElementById('setup-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const rollNo = document.getElementById('setupRollNo').value.trim();
-            const regNo = document.getElementById('setupRegNo').value.trim();
-            const name = document.getElementById('setupName').value.trim();
-            const crPass = document.getElementById('setupPassCR').value.trim();
-            
-            const btn = e.target.querySelector('button');
-            btn.innerText = 'Creating Class...';
-
-            try {
-                window.systemMeta = { transferUsed: false };
-                await setDoc(doc(db, 'classes', currentClass, 'meta', 'system'), window.systemMeta);
-                await setDoc(doc(db, 'classes', currentClass, 'meta', 'session'), { activeCR: null, crName: null, timestamp: 0 });
-                await setDoc(doc(db, 'classes', currentClass, 'users', regNo), { rollNo, name, regNo, password: crPass, role: 'cr', createdAt: Date.now() });
-
-                showToast("Class created successfully!");
-                currentUserData = { rollNo, name, regNo, role: 'cr' };
-                document.getElementById('class-setup-view').classList.add('hidden');
-                document.getElementById('cr-view').style.display = 'flex';
-                document.querySelectorAll('.header-class-display').forEach(el => el.innerText = currentClass);
-                
-                listenToAnnouncements();
-                listenToTimetable();
-                loadClassRoster();
-                listenToSession(); 
-                loadChecklistDraft(); 
-                listenToAttendanceHistory();
-                listenToPasswordRequests();
-            } catch(err) {
-                showToast("Failed to create class", "error");
-                window.currentClass = null;
-            }
-            btn.innerText = 'Create Class & Login';
-        });
-
+        // ---------- UI VIEW TOGGLES ---------- //
         window.toggleAuthMode = function(mode) {
             const loginForm = document.getElementById('login-form');
             const regForm = document.getElementById('register-form');
             const title = document.getElementById('auth-title');
-            const subtitle = document.getElementById('auth-subtitle');
+            const subtitle = document.getElementById('auth-class-indicator');
 
             document.getElementById('password-reset-form').classList.add('hidden');
 
             if (mode === 'register') {
                 loginForm.classList.add('hidden');
                 regForm.classList.remove('hidden');
-                title.innerText = 'Join the Class';
-                subtitle.innerText = 'Register to access the roster';
+                title.innerText = 'Join or Create Class';
+                subtitle.innerText = 'Register to access your class';
             } else {
                 regForm.classList.add('hidden');
                 loginForm.classList.remove('hidden');
-                title.innerText = 'Welcome Back';
+                title.innerText = 'Dashboard By CR';
                 subtitle.innerText = 'Login to access your dashboard';
             }
         }
@@ -823,8 +694,16 @@
             window.resetTargetRegNo = null;
             document.getElementById('password-reset-form').classList.add('hidden');
             document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('auth-title').innerText = 'Welcome Back';
-            document.getElementById('auth-subtitle').innerText = 'Login to access your dashboard';
+            document.getElementById('auth-title').innerText = 'Dashboard By CR';
+            document.getElementById('auth-class-indicator').innerText = 'Login to access your dashboard';
+        }
+
+        window.showLogin = function() {
+            window.currentClass = null;
+            document.getElementById('login-form').reset();
+            document.getElementById('register-form').reset();
+            document.getElementById('password-reset-form').reset();
+            toggleAuthMode('login');
         }
 
         window.logout = async function() {
@@ -843,7 +722,8 @@
             showCRWorkspace(null);
             showStudentWorkspace(null);
             
-            goBackToClassSelection();
+            document.getElementById('auth-view').style.display = 'block';
+            showLogin();
             showToast("Logged out successfully");
         }
 
@@ -953,7 +833,7 @@
             const dateVal = document.getElementById('classDate').value;
             const formattedDate = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-            if(!confirm(`Publish this attendance record to all students?\nDate: ${formattedDate}\nEvent: ${eventName}`)) return;
+            if(!confirm(`Publish this attendance record to all students?\\nDate: ${formattedDate}\\nEvent: ${eventName}`)) return;
 
             const btn = document.getElementById('btn-publish-attendance');
             const originalHTML = btn.innerHTML;
@@ -1261,6 +1141,17 @@
             btn.innerText = 'Verifying...';
 
             try {
+                // STEP 1: Query global directory to find which class the student belongs to
+                const dirSnap = await getDoc(doc(db, 'directory', regNo));
+                if (!dirSnap.exists()) {
+                    showToast('Registration No not found. Please register first.', 'error');
+                    btn.innerText = 'Login';
+                    return;
+                }
+                
+                window.currentClass = dirSnap.data().classId;
+                
+                // STEP 2: Authenticate securely against that specific class
                 const docSnap = await getDoc(doc(db, 'classes', currentClass, 'users', regNo));
 
                 if (docSnap.exists()) {
@@ -1271,7 +1162,7 @@
                         document.getElementById('login-form').classList.add('hidden');
                         document.getElementById('password-reset-form').classList.remove('hidden');
                         document.getElementById('auth-title').innerText = 'Set New Password';
-                        document.getElementById('auth-subtitle').innerText = 'Enter your new credentials';
+                        document.getElementById('auth-class-indicator').innerText = 'Enter your new credentials';
                         btn.innerText = 'Login';
                         return;
                     }
@@ -1301,8 +1192,8 @@
                         window.loginAttempts[regNo] = attempts + 1;
                         showToast(`Incorrect password. Attempt ${window.loginAttempts[regNo]} of 3`, 'error');
                     }
-                } else { showToast('Registration No not found in this class.', 'error'); }
-            } catch (err) { showToast("Connection error", "error"); }
+                } else { showToast('Account not found in class database.', 'error'); }
+            } catch (err) { showToast("Connection error", "error"); console.error(err); }
             btn.innerText = 'Login';
         });
 
@@ -1330,37 +1221,65 @@
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const classId = document.getElementById('regClassCode').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
             const rollNo = document.getElementById('regRollNo').value.trim();
             const name = document.getElementById('regName').value.trim();
             const regNo = document.getElementById('regRegNo').value.trim();
             const pass = document.getElementById('regPass').value.trim();
-            const btn = e.target.querySelector('button');
+            const btn = e.target.querySelector('button[type="submit"]');
+
+            btn.innerText = 'Processing...';
 
             try {
-                const docRef = doc(db, 'classes', currentClass, 'users', regNo);
-                const docSnap = await getDoc(docRef);
+                const dirRef = doc(db, 'directory', regNo);
+                const dirSnap = await getDoc(dirRef);
 
-                if (docSnap.exists()) {
-                    if (confirm('An account with this Registration No already exists. Do you want to request a password reset from the CR?')) {
-                        await setDoc(doc(db, 'classes', currentClass, 'password_requests', regNo), {
+                if (dirSnap.exists()) {
+                    const existingClass = dirSnap.data().classId;
+                    if (confirm(`An account with this Reg No already exists (Class: ${existingClass}). Request a password reset from the CR?`)) {
+                        await setDoc(doc(db, 'classes', existingClass, 'password_requests', regNo), {
                             regNo: regNo,
-                            name: docSnap.data().name,
-                            rollNo: docSnap.data().rollNo,
-                            role: docSnap.data().role,
+                            name: name,
+                            rollNo: rollNo,
+                            role: 'student',
                             timestamp: Date.now()
                         });
                         showToast("Password reset request sent to CR. Check back later to login.", "success");
                         toggleAuthMode('login');
                     }
-                } else {
-                    btn.innerText = 'Saving...';
-                    await setDoc(docRef, { rollNo, name, regNo, password: pass, role: 'student', createdAt: Date.now() });
-                    showToast('Registration successful! You can now login.');
-                    toggleAuthMode('login');
-                    document.getElementById('loginRegNo').value = regNo;
                     btn.innerText = 'Register & Join';
+                    return;
                 }
-            } catch (err) { showToast("Registration failed", "error"); btn.innerText = 'Register & Join'; }
+
+                const metaSnap = await getDoc(doc(db, 'classes', classId, 'meta', 'system'));
+                const isNewClass = !metaSnap.exists();
+
+                if (isNewClass) {
+                    window.systemMeta = { transferUsed: false };
+                    await setDoc(doc(db, 'classes', classId, 'meta', 'system'), window.systemMeta);
+                    await setDoc(doc(db, 'classes', classId, 'meta', 'session'), { activeCR: null, crName: null, timestamp: 0 });
+                }
+
+                const role = isNewClass ? 'cr' : 'student';
+
+                // Save data under the class AS REQUESTED, and map it in the root directory
+                await setDoc(doc(db, 'classes', classId, 'users', regNo), { rollNo, name, regNo, password: pass, role, createdAt: Date.now() });
+                await setDoc(dirRef, { classId });
+
+                if (isNewClass) {
+                    showToast('Class created! You are the Master CR. Please login.');
+                } else {
+                    showToast('Registration successful! You can now login.');
+                }
+                
+                toggleAuthMode('login');
+                document.getElementById('loginRegNo').value = regNo;
+
+            } catch (err) { 
+                showToast("Registration failed", "error"); 
+                console.error(err);
+            }
+            btn.innerText = 'Register & Join';
         });
 
         function loadClassRoster() {
@@ -1395,6 +1314,7 @@
             if(!confirm("Remove this student from the class roster?")) return;
             try {
                 await deleteDoc(doc(db, 'classes', currentClass, 'users', studentId));
+                await deleteDoc(doc(db, 'directory', studentId)); // Cleanup mapping
                 delete attendanceRecord[studentId]; 
                 delete checklistRecord[studentId];
                 showToast("Student removed");
@@ -1556,7 +1476,10 @@
                 const q = query(collection(db, 'classes', currentClass, 'users'), where('role', '==', 'student'));
                 const querySnapshot = await getDocs(q);
                 const deletePromises = [];
-                querySnapshot.forEach((d) => { deletePromises.push(deleteDoc(doc(db, 'classes', currentClass, 'users', d.id))); });
+                querySnapshot.forEach((d) => { 
+                    deletePromises.push(deleteDoc(doc(db, 'classes', currentClass, 'users', d.id))); 
+                    deletePromises.push(deleteDoc(doc(db, 'directory', d.id))); // Cleanup mapping
+                });
                 await Promise.all(deletePromises);
                 showToast("All student entries deleted.");
                 closeSettingsModal();
@@ -1571,10 +1494,13 @@
                     await deleteDoc(doc(db, 'classes', currentClass, 'meta', metaDoc));
                 });
                 
-                // Delete Users
+                // Delete Users & Directory mappings
                 const querySnapshot = await getDocs(collection(db, 'classes', currentClass, 'users'));
                 const deletePromises = [];
-                querySnapshot.forEach((d) => { deletePromises.push(deleteDoc(doc(db, 'classes', currentClass, 'users', d.id))); });
+                querySnapshot.forEach((d) => { 
+                    deletePromises.push(deleteDoc(doc(db, 'classes', currentClass, 'users', d.id))); 
+                    deletePromises.push(deleteDoc(doc(db, 'directory', d.id))); // Cleanup mapping
+                });
                 const prSnapshot = await getDocs(collection(db, 'classes', currentClass, 'password_requests'));
                 prSnapshot.forEach((d) => { deletePromises.push(deleteDoc(doc(db, 'classes', currentClass, 'password_requests', d.id))); });
                 
@@ -1618,15 +1544,15 @@
             });
             
             // Build Text Summary
-            let textSummary = `*Attendance Report*\n=====================\nCourse: ${courseName}\nClass:  ${className}\n`;
-            if (eventName) textSummary += `Event:  ${eventName}\n`;
-            textSummary += `Date:   ${formattedDate}\n\n*PRESENT (${presentStudents.length}):*\n---------------------\n`;
-            if (presentStudents.length === 0) textSummary += `(None)\n`;
-            presentStudents.forEach((s, i) => textSummary += `${i+1}. ${s.rollNo}\t- ${s.name} (${s.regNo})\n`);
+            let textSummary = `*Attendance Report*\\n=====================\\nCourse: ${courseName}\\nClass:  ${className}\\n`;
+            if (eventName) textSummary += `Event:  ${eventName}\\n`;
+            textSummary += `Date:   ${formattedDate}\\n\\n*PRESENT (${presentStudents.length}):*\\n---------------------\\n`;
+            if (presentStudents.length === 0) textSummary += `(None)\\n`;
+            presentStudents.forEach((s, i) => textSummary += `${i+1}. ${s.rollNo}\\t- ${s.name} (${s.regNo})\\n`);
             
-            textSummary += `\n*ABSENT (${absentStudents.length}):*\n---------------------\n`;
-            if (absentStudents.length === 0) textSummary += `(None)\n`;
-            absentStudents.forEach((s, i) => textSummary += `${i+1}. ${s.rollNo}\t- ${s.name} (${s.regNo})\n`);
+            textSummary += `\\n*ABSENT (${absentStudents.length}):*\\n---------------------\\n`;
+            if (absentStudents.length === 0) textSummary += `(None)\\n`;
+            absentStudents.forEach((s, i) => textSummary += `${i+1}. ${s.rollNo}\\t- ${s.name} (${s.regNo})\\n`);
 
             document.getElementById('text-summary-output').value = textSummary;
             document.getElementById('text-summary-section').classList.remove('hidden');
@@ -1695,8 +1621,8 @@
             const btn = document.getElementById('btn-export-checklist');
             btn.innerHTML = 'Generating...'; btn.disabled = true;
 
-            let textSummary = `*${forValue}*\n=====================\nDate: ${dateVal}\nTotal Confirmed: ${checkedStudents.length}\n\n*CONFIRMED STUDENTS:*\n---------------------\n`;
-            checkedStudents.forEach((s, i) => { textSummary += `${i+1}. ${s.rollNo}\t- ${s.name} (${s.regNo})\n`; });
+            let textSummary = `*${forValue}*\\n=====================\\nDate: ${dateVal}\\nTotal Confirmed: ${checkedStudents.length}\\n\\n*CONFIRMED STUDENTS:*\\n---------------------\\n`;
+            checkedStudents.forEach((s, i) => { textSummary += `${i+1}. ${s.rollNo}\\t- ${s.name} (${s.regNo})\\n`; });
 
             document.getElementById('text-summary-output').value = textSummary;
             document.getElementById('text-summary-section').classList.remove('hidden');
@@ -1750,4 +1676,8 @@
         };
     </script>
 </body>
-</html>
+</html>"""
+
+with open("updated_attendance_manager.html", "w", encoding="utf-8") as f:
+    f.write(html_code)
+print("File generated successfully.")
