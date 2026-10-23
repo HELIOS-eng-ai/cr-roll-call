@@ -7,10 +7,30 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        body { font-family: 'Quicksand', sans-serif; background-color: #396d7c; color: #4a3f35; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Fraunces', serif; color: #b75d46; }
+        .bg-blue-600 { background-color: #b75d46 !important; }
+        .bg-blue-800 { background-color: #8c422f !important; }
+        .hover\:bg-blue-700:hover { background-color: #a3503a !important; }
+        .text-blue-600 { color: #b75d46 !important; }
+        .bg-indigo-600 { background-color: #7b8c5a !important; }
+        .bg-indigo-700 { background-color: #6a7a49 !important; }
+        .hover\:bg-indigo-700:hover { background-color: #6a7a49 !important; }
+        .text-indigo-600 { color: #7b8c5a !important; }
+        .bg-indigo-100 { background-color: #e5ecd6 !important; }
+        .border-indigo-500 { border-color: #7b8c5a !important; }
+        .rounded-xl { border-radius: 1.5rem !important; }
+        .rounded-lg { border-radius: 1rem !important; }
+        .rounded-md { border-radius: 0.75rem !important; }
+        .shadow-xl { box-shadow: 0 10px 25px -5px rgba(183, 93, 70, 0.1), 0 8px 10px -6px rgba(183, 93, 70, 0.1) !important; }
+        .border-gray-200 { border-color: #e8dfd1 !important; }
+        .bg-gray-50 { background-color: #f5f0e6 !important; }
+        input, select, textarea { border-color: #d1c7b8 !important; border-radius: 0.75rem !important; background-color: #fffaf4 !important; }
+        input:focus, select:focus, textarea:focus { border-color: #b75d46 !important; box-shadow: 0 0 0 2px rgba(183, 93, 70, 0.2) !important; }
+        .table-container::-webkit-scrollbar-thumb { background-color: #d1c7b8; }
         .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
         .table-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
         @keyframes slideIn {
@@ -20,7 +40,7 @@
         .toast-enter { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen flex flex-col items-center py-8 px-4">
+<body class="text-gray-800 antialiased min-h-screen flex flex-col items-center py-4 px-4">
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
@@ -83,6 +103,9 @@
     <div id="auth-view" class="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden mt-10 border border-gray-200 transition-all">
         <div class="bg-blue-600 text-white px-6 py-4 text-center relative">
             <h1 class="text-2xl font-bold" id="auth-title">Dashboard By CR</h1>
+            <div class="flex justify-center my-3">
+                <img src="https://i.ibb.co/Myx9w58G/Cr-dashboard-Connect.png" alt="Logo" class="h-16 w-16 rounded-full object-cover shadow-md border-2 border-white bg-white" />
+            </div>
             <p class="text-blue-100 text-sm mt-1 font-mono" id="auth-class-indicator">Login to access your dashboard</p>
         </div>
         <div class="p-6">
@@ -96,11 +119,9 @@
                     <label for="loginPass" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                     <input type="password" id="loginPass" required class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
                 </div>
-                <div class="flex flex-col gap-2 mt-6">
-                    <button type="submit" id="btn-login-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Login</button>
-                </div>
-                <div class="text-center mt-4 text-sm text-gray-600">
-                    New student or Forgot Password? <a href="#" onclick="toggleAuthMode('register')" class="text-blue-600 font-semibold hover:underline">Register/Reset here</a>
+                <div class="flex flex-col sm:flex-row gap-3 mt-6">
+                    <button type="submit" id="btn-login-submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md transition-all">Login</button>
+                    <button type="button" onclick="toggleAuthMode('register')" class="flex-1 bg-[#7b8c5a] hover:bg-[#6a7a49] text-white py-3 rounded-lg font-bold shadow-md transition-all">New Registration</button>
                 </div>
             </form>
 
@@ -153,9 +174,12 @@
     <!-- 2. STUDENT DASHBOARD -->
     <div id="student-dashboard-view" class="hidden w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden flex-col mt-10">
         <div class="bg-indigo-600 text-white px-6 py-4 flex justify-between items-center shrink-0">
-            <div>
-                <h1 class="text-2xl font-bold">Students Dashboard</h1>
-                <p class="text-indigo-100 text-sm mt-1"><span id="student-welcome-text"></span> | <span class="font-mono bg-indigo-800 px-2 py-0.5 rounded ml-1 header-class-display"></span></p>
+            <div class="flex items-center gap-4">
+                <img src="https://i.ibb.co/Myx9w58G/Cr-dashboard-Connect.png" alt="Logo" class="hidden sm:block h-12 w-12 rounded-full object-cover shadow-sm border-2 border-white/50 bg-white" />
+                <div>
+                    <h1 class="text-2xl font-bold">Students Dashboard</h1>
+                    <p class="text-indigo-100 text-sm mt-1 flex items-center gap-2"><span id="student-welcome-text"></span> | <span class="font-mono bg-indigo-800 px-2 py-0.5 rounded header-class-display"></span></p>
+                </div>
             </div>
             <div class="flex items-center gap-4">
                 <div class="hidden sm:flex text-sm font-medium bg-indigo-700 px-3 py-1 rounded-full items-center gap-2">
@@ -171,7 +195,7 @@
         
         <div class="p-6 bg-gray-50 flex-grow flex flex-col min-h-[50vh]">
             <!-- Student Home Cards -->
-            <div id="student-home-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto w-full">
+            <div id="student-home-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto w-full">
                 <div onclick="showStudentWorkspace('workspace-announcements-student')" class="bg-white border-2 border-gray-200 rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[220px] cursor-pointer hover:border-indigo-500 hover:shadow-md group">
                     <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
@@ -192,6 +216,13 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-800">My Attendance</h3>
                     <p class="text-sm text-gray-500 mt-2 text-center">View your personal attendance history</p>
+                </div>
+                <div onclick="showStudentWorkspace('workspace-complaints-student')" class="bg-white border-2 border-gray-200 rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[220px] cursor-pointer hover:border-red-500 hover:shadow-md group">
+                    <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800">Complaints</h3>
+                    <p class="text-sm text-gray-500 mt-2 text-center">Raise & track issues</p>
                 </div>
             </div>
 
@@ -258,15 +289,41 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Workspace: Complaints -->
+            <div id="workspace-complaints-student" class="hidden flex-col gap-6 max-w-3xl mx-auto w-full">
+                <div class="flex justify-start">
+                    <button onclick="showStudentWorkspace(null)" class="text-gray-700 hover:text-red-600 flex items-center gap-2 font-bold text-sm bg-white px-4 py-2 rounded-md shadow-sm border border-gray-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Back to Dashboard
+                    </button>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col min-h-[50vh]">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">My Complaints</h4>
+                    <div id="student-complaints-list" class="flex-grow space-y-4 overflow-y-auto max-h-[60vh] pb-4">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="pt-4 border-t border-gray-200 mt-4 shrink-0">
+                        <button onclick="openComplaintDraftModal()" class="w-full bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-md font-bold transition-colors shadow-sm flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Draft Complaint
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <!-- 3. CR DASHBOARD -->
     <div id="cr-view" class="hidden w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden flex-col">
         <div class="bg-blue-600 text-white px-6 py-4 flex items-center justify-between shrink-0">
-            <div>
-                <h1 class="text-2xl font-bold">Class Attendance Manager</h1>
-                <p class="text-blue-100 text-sm mt-1">CR Dashboard | <span class="font-mono bg-blue-800 px-2 py-0.5 rounded ml-1 header-class-display"></span></p>
+            <div class="flex items-center gap-4">
+                <img src="https://i.ibb.co/Myx9w58G/Cr-dashboard-Connect.png" alt="Logo" class="hidden sm:block h-12 w-12 rounded-full object-cover shadow-sm border-2 border-white/50 bg-white" />
+                <div>
+                    <h1 class="text-2xl font-bold">Class Attendance Manager</h1>
+                    <p class="text-blue-100 text-sm mt-1 flex items-center gap-2">CR Dashboard | <span class="font-mono bg-blue-800 px-2 py-0.5 rounded header-class-display"></span></p>
+                </div>
             </div>
             <div class="flex items-center gap-4">
                 <div class="hidden lg:flex text-sm font-medium bg-blue-700 px-3 py-1 rounded-full items-center gap-2">
@@ -291,7 +348,7 @@
         <div class="p-6 flex-grow flex flex-col gap-6 bg-gray-50 min-h-[60vh]" id="cr-main-content">
             
             <!-- CR Home Cards -->
-            <div id="cr-home-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div id="cr-home-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div id="attendance-card" onclick="requestAttendanceAccess()" class="bg-white border-2 border-gray-200 rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[220px] relative hover:border-blue-500 cursor-pointer hover:shadow-md group">
                     <div class="absolute top-4 right-4" id="attendance-card-status">
                         <span class="bg-gray-100 text-gray-500 px-2 py-1 rounded-full text-xs font-bold animate-pulse">Checking status...</span>
@@ -315,6 +372,13 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-800">Timetable & Teachers</h3>
                     <p class="text-sm text-gray-500 mt-2 text-center">Manage schedule and sync to students</p>
+                </div>
+                <div onclick="showCRWorkspace('workspace-complaints-cr')" class="bg-white border-2 border-gray-200 rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[220px] relative hover:border-red-500 cursor-pointer hover:shadow-md group">
+                    <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800">Complaints</h3>
+                    <p class="text-sm text-gray-500 mt-2 text-center">Manage student issues</p>
                 </div>
             </div>
 
@@ -477,6 +541,23 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Workspace 4: Complaints -->
+            <div id="workspace-complaints-cr" class="hidden flex-col gap-6 flex-grow">
+                <div class="flex justify-start">
+                    <button onclick="showCRWorkspace(null)" class="text-gray-700 hover:text-red-600 flex items-center gap-2 font-bold text-sm bg-white hover:bg-gray-50 px-4 py-2 rounded-md shadow-sm border border-gray-200 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Back to Dashboard
+                    </button>
+                </div>
+                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm flex flex-col flex-grow">
+                    <h2 class="font-bold text-gray-800 text-lg border-b pb-2 mb-4">Student Complaints</h2>
+                    <div id="cr-complaints-list" class="flex-grow space-y-4 overflow-y-auto max-h-[65vh]">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -553,6 +634,60 @@
                 <div class="mt-4 flex justify-end items-center gap-4">
                     <button onclick="closeAnnouncementDraftModal()" class="text-gray-600 hover:text-gray-800 font-bold text-sm transition-colors">Cancel</button>
                     <button id="btn-publish-announcement" onclick="publishAnnouncement()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-md font-bold transition-colors shadow-sm">Publish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complaint Draft Modal (Student) -->
+    <div id="complaint-draft-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[60] px-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all">
+            <div class="bg-red-600 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">Draft Complaint</h3>
+                <button onclick="closeComplaintDraftModal()" class="text-red-200 hover:text-white transition-colors">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="mb-4 flex items-center justify-between border-b pb-4">
+                    <label class="font-bold text-sm text-gray-700">Send As:</label>
+                    <div class="flex items-center gap-4">
+                        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                            <input type="radio" name="complaint-identity" value="name" checked class="text-red-600 focus:ring-red-500 w-4 h-4">
+                            My Name
+                        </label>
+                        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                            <input type="radio" name="complaint-identity" id="complaint-anon" value="anonymous" class="text-red-600 focus:ring-red-500 w-4 h-4">
+                            Anonymous
+                        </label>
+                    </div>
+                </div>
+                <textarea id="complaint-input" class="w-full h-32 p-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-red-500 resize-none" placeholder="Write your complaint here..."></textarea>
+                
+                <div class="mt-4 flex justify-end items-center gap-4">
+                    <button onclick="closeComplaintDraftModal()" class="text-gray-600 hover:text-gray-800 font-bold text-sm transition-colors">Cancel</button>
+                    <button id="btn-submit-complaint" onclick="submitComplaint()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md font-bold transition-colors shadow-sm">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CR Complaint Reply Modal -->
+    <div id="complaint-reply-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[60] px-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all">
+            <div class="bg-blue-600 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">Reply to Complaint</h3>
+                <button onclick="closeComplaintReplyModal()" class="text-blue-200 hover:text-white transition-colors">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-3">Your reply will go directly to the student who raised this complaint.</p>
+                <textarea id="complaint-reply-input" class="w-full h-32 p-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Type your reply here..."></textarea>
+                
+                <div class="mt-4 flex justify-end items-center gap-4">
+                    <button onclick="closeComplaintReplyModal()" class="text-gray-600 hover:text-gray-800 font-bold text-sm transition-colors">Cancel</button>
+                    <button id="btn-submit-complaint-reply" onclick="submitComplaintReply()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-bold transition-colors shadow-sm">Send Reply</button>
                 </div>
             </div>
         </div>
@@ -720,6 +855,154 @@
         });
         signInAnonymously(auth); 
 
+        
+        window.allComplaints = [];
+        window.currentReplyComplaintId = null;
+
+        function listenToComplaints() {
+            if(!currentClass) return;
+            onSnapshot(collection(db, 'classes', currentClass, 'complaints'), (snapshot) => {
+                window.allComplaints = [];
+                snapshot.forEach(doc => window.allComplaints.push({id: doc.id, ...doc.data()}));
+                window.allComplaints.sort((a,b) => b.timestamp - a.timestamp);
+                if (currentUserData && currentUserData.role === 'cr') renderCRComplaints();
+                if (currentUserData && currentUserData.role === 'student') renderStudentComplaints();
+            });
+        }
+
+        function renderStudentComplaints() {
+            const listEl = document.getElementById('student-complaints-list');
+            if(!listEl) return;
+            const myComplaints = window.allComplaints.filter(c => c.studentRegNo === currentUserData.regNo);
+            if(myComplaints.length === 0) {
+                listEl.innerHTML = '<p class="text-gray-500 text-center py-8">No complaints raised yet.</p>';
+                return;
+            }
+            listEl.innerHTML = myComplaints.map(c => {
+                const isResolved = c.status === 'Resolved';
+                const bgClass = isResolved ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300';
+                const statusText = isResolved ? 'text-green-800' : 'text-red-800';
+                return `
+                    <div class="p-4 border-2 rounded-md mb-4 ${bgClass} shadow-sm transition-all">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider bg-white px-2 py-1 rounded shadow-sm ${statusText}">${c.status}</span>
+                            <span class="text-xs text-gray-600 font-semibold bg-white bg-opacity-70 px-2 py-1 rounded">${new Date(c.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        <p class="text-gray-900 text-sm whitespace-pre-wrap mt-2 font-medium">${escapeHtml(c.text)}</p>
+                        ${c.reply ? '<div class="mt-3 pt-3 border-t border-gray-400 border-opacity-50"><p class="text-xs font-bold text-gray-800 mb-1 flex items-center gap-1"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>Reply from CR:</p><p class="text-sm text-gray-800 whitespace-pre-wrap bg-white bg-opacity-60 p-3 rounded mt-1 border border-gray-200">' + escapeHtml(c.reply) + '</p></div>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCRComplaints() {
+            const listEl = document.getElementById('cr-complaints-list');
+            if(!listEl) return;
+            if(window.allComplaints.length === 0) {
+                listEl.innerHTML = '<p class="text-gray-500 text-center py-8">No complaints received.</p>';
+                return;
+            }
+            listEl.innerHTML = window.allComplaints.map(c => {
+                const isResolved = c.status === 'Resolved';
+                const bgClass = isResolved ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200';
+                return `
+                    <div class="p-4 border rounded-md mb-4 ${bgClass}">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800 flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                    ${escapeHtml(c.authorDisplay)}
+                                </p>
+                                <p class="text-xs text-gray-500 mt-0.5">${new Date(c.timestamp).toLocaleString()}</p>
+                            </div>
+                            <span class="text-xs font-bold uppercase tracking-wider ${isResolved ? 'text-green-700' : 'text-red-600'} bg-white px-2 py-1 rounded shadow-sm">${c.status}</span>
+                        </div>
+                        <p class="text-gray-800 text-sm whitespace-pre-wrap mt-3 bg-white p-3 rounded border border-gray-100">${escapeHtml(c.text)}</p>
+                        
+                        ${c.reply ? '<div class="mt-3 pt-3 border-t border-gray-200 bg-blue-50 border border-blue-100 p-3 rounded"><p class="text-xs font-bold text-blue-800 mb-1">Your Reply:</p><p class="text-sm text-gray-800 whitespace-pre-wrap">' + escapeHtml(c.reply) + '</p></div>' : ''}
+                        
+                        <div class="mt-4 flex gap-2 justify-end pt-3 border-t border-gray-200">
+                            <button onclick="toggleComplaintStatus('${c.id}', '${isResolved ? 'Under Process' : 'Resolved'}')" class="${isResolved ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-green-600 text-white hover:bg-green-700'} px-4 py-2 rounded text-xs font-bold transition-colors shadow-sm">
+                                ${isResolved ? 'Mark as Under Process' : 'Mark as Resolved'}
+                            </button>
+                            <button onclick="openComplaintReplyModal('${c.id}')" class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded text-xs font-bold transition-colors shadow-sm">
+                                Reply
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.openComplaintDraftModal = function() { document.getElementById('complaint-draft-modal').classList.remove('hidden'); };
+        window.closeComplaintDraftModal = function() { document.getElementById('complaint-draft-modal').classList.add('hidden'); };
+
+        window.submitComplaint = async function() {
+            const text = document.getElementById('complaint-input').value.trim();
+            const anon = document.getElementById('complaint-anon').checked;
+            if(!text) return;
+            const btn = document.getElementById('btn-submit-complaint');
+            btn.innerText = "Sending...";
+            
+            try {
+                const newDocRef = doc(collection(db, 'classes', currentClass, 'complaints'));
+                await setDoc(newDocRef, {
+                    studentRegNo: currentUserData.regNo,
+                    authorDisplay: anon ? "Anonymous" : currentUserData.name,
+                    text: text,
+                    status: 'Under Process',
+                    reply: '',
+                    timestamp: Date.now()
+                });
+                showToast("Complaint submitted successfully!");
+                document.getElementById('complaint-input').value = '';
+                document.getElementById('complaint-anon').checked = false;
+                closeComplaintDraftModal();
+            } catch(e) {
+                showToast("Failed to submit complaint", "error");
+            }
+            btn.innerText = "Send";
+        };
+
+        window.openComplaintReplyModal = function(id) {
+            window.currentReplyComplaintId = id;
+            const complaint = window.allComplaints.find(c => c.id === id);
+            document.getElementById('complaint-reply-input').value = complaint.reply || '';
+            document.getElementById('complaint-reply-modal').classList.remove('hidden');
+        };
+        window.closeComplaintReplyModal = function() {
+            window.currentReplyComplaintId = null;
+            document.getElementById('complaint-reply-modal').classList.add('hidden');
+        };
+
+        window.submitComplaintReply = async function() {
+            const text = document.getElementById('complaint-reply-input').value.trim();
+            if(!window.currentReplyComplaintId) return;
+            const btn = document.getElementById('btn-submit-complaint-reply');
+            btn.innerText = "Sending...";
+            try {
+                await updateDoc(doc(db, 'classes', currentClass, 'complaints', window.currentReplyComplaintId), {
+                    reply: text
+                });
+                showToast("Reply sent successfully!");
+                closeComplaintReplyModal();
+            } catch(e) {
+                showToast("Failed to send reply", "error");
+            }
+            btn.innerText = "Send Reply";
+        };
+
+        window.toggleComplaintStatus = async function(id, newStatus) {
+            try {
+                await updateDoc(doc(db, 'classes', currentClass, 'complaints', id), {
+                    status: newStatus
+                });
+                showToast("Status updated to " + newStatus);
+            } catch(e) {
+                showToast("Failed to update status", "error");
+            }
+        };
+
         // ---------- 0. CLASS GATEWAY ---------- //
         document.getElementById('class-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -790,6 +1073,7 @@
                 loadChecklistDraft(); 
                 listenToAttendanceHistory();
                 listenToPasswordRequests();
+                listenToComplaints();
             } catch(err) {
                 showToast("Failed to create class", "error");
                 window.currentClass = null;
@@ -851,7 +1135,7 @@
             document.getElementById('cr-home-cards').classList.add('hidden');
             document.getElementById('text-summary-section').classList.add('hidden');
             
-            ['attendance-workspace', 'workspace-checklist', 'workspace-timetable-cr'].forEach(id => {
+            ['attendance-workspace', 'workspace-checklist', 'workspace-timetable-cr', 'workspace-complaints-cr'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
                 document.getElementById(id).classList.remove('flex');
             });
@@ -868,7 +1152,7 @@
             document.getElementById('student-home-cards').classList.add('hidden');
             document.getElementById('text-summary-section').classList.add('hidden');
             
-            ['workspace-announcements-student', 'workspace-timetable-student', 'workspace-attendance-student'].forEach(id => {
+            ['workspace-announcements-student', 'workspace-timetable-student', 'workspace-attendance-student', 'workspace-complaints-student'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
                 document.getElementById(id).classList.remove('flex');
             });
@@ -952,7 +1236,9 @@
             const dateVal = document.getElementById('classDate').value;
             const formattedDate = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-            if(!confirm(`Publish this attendance record to all students?\\nDate: ${formattedDate}\\nEvent: ${eventName}`)) return;
+            if(!confirm(`Publish this attendance record to all students?
+Date: ${formattedDate}
+Event: ${eventName}`)) return;
 
             const btn = document.getElementById('btn-publish-attendance');
             const originalHTML = btn.innerHTML;
@@ -1292,6 +1578,7 @@
                         listenToAnnouncements();
                         listenToTimetable();
                         listenToAttendanceHistory();
+                        listenToComplaints();
 
                         if (data.role === 'cr') {
                             document.getElementById('cr-view').style.display = 'flex';
@@ -1656,15 +1943,31 @@
             });
             
             // Build Text Summary
-            let textSummary = `*Attendance Report*\\n=====================\\nCourse: ${courseName}\\nClass:  ${className}\\n`;
-            if (eventName) textSummary += `Event:  ${eventName}\\n`;
-            textSummary += `Date:   ${formattedDate}\\n\\n*PRESENT (${presentStudents.length}):*\\n---------------------\\n`;
-            if (presentStudents.length === 0) textSummary += `(None)\\n`;
-            presentStudents.forEach((s, i) => textSummary += `${i+1}. ${s.rollNo}\\t- ${s.name} (${s.regNo})\\n`);
+            let textSummary = `*Attendance Report*
+=====================
+Course: ${courseName}
+Class:  ${className}
+`;
+            if (eventName) textSummary += `Event:  ${eventName}
+`;
+            textSummary += `Date:   ${formattedDate}
+
+*PRESENT (${presentStudents.length}):*
+---------------------
+`;
+            if (presentStudents.length === 0) textSummary += `(None)
+`;
+            presentStudents.forEach((s, i) => textSummary += `${i+1}. ${s.rollNo}	- ${s.name} (${s.regNo})
+`);
             
-            textSummary += `\\n*ABSENT (${absentStudents.length}):*\\n---------------------\\n`;
-            if (absentStudents.length === 0) textSummary += `(None)\\n`;
-            absentStudents.forEach((s, i) => textSummary += `${i+1}. ${s.rollNo}\\t- ${s.name} (${s.regNo})\\n`);
+            textSummary += `
+*ABSENT (${absentStudents.length}):*
+---------------------
+`;
+            if (absentStudents.length === 0) textSummary += `(None)
+`;
+            absentStudents.forEach((s, i) => textSummary += `${i+1}. ${s.rollNo}	- ${s.name} (${s.regNo})
+`);
 
             document.getElementById('text-summary-output').value = textSummary;
             document.getElementById('text-summary-section').classList.remove('hidden');
@@ -1733,8 +2036,16 @@
             const btn = document.getElementById('btn-export-checklist');
             btn.innerHTML = 'Generating...'; btn.disabled = true;
 
-            let textSummary = `*${forValue}*\\n=====================\\nDate: ${dateVal}\\nTotal Confirmed: ${checkedStudents.length}\\n\\n*CONFIRMED STUDENTS:*\\n---------------------\\n`;
-            checkedStudents.forEach((s, i) => { textSummary += `${i+1}. ${s.rollNo}\\t- ${s.name} (${s.regNo})\\n`; });
+            let textSummary = `*${forValue}*
+=====================
+Date: ${dateVal}
+Total Confirmed: ${checkedStudents.length}
+
+*CONFIRMED STUDENTS:*
+---------------------
+`;
+            checkedStudents.forEach((s, i) => { textSummary += `${i+1}. ${s.rollNo}	- ${s.name} (${s.regNo})
+`; });
 
             document.getElementById('text-summary-output').value = textSummary;
             document.getElementById('text-summary-section').classList.remove('hidden');
@@ -1788,5 +2099,4 @@
         };
     </script>
 </body>
-</html>"""
-
+</html>
